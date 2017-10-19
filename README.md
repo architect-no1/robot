@@ -1,2 +1,3 @@
 # robot
-Robot SW Repository
+Robot / UI SW Repository for CMU Architect Course Project
+
