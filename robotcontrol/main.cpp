@@ -23,8 +23,51 @@ static bool haveStdin() {
   return 0 < ret;
 }
 
+class EventHandler : public yolo::Robot::Listener {
+private:
+  yolo::Robot *r;
+
+public:
+  EventHandler(yolo::Robot *robot) : r(robot) { }
+
+  std::string wallsToMapString() {
+    std::string ret;
+    ret = r->isWallFront() ? ". X . " : ". O . ";
+    ret += r->isWallLeft() ? "X O "   : "O O ";
+    ret += r->isWallRight()?     "X " :     "O ";
+    ret += ". . .";
+    return ret;
+  }
+
+  void onMoveComplete(const char *move) {
+    printf("ack %s %s\n", move, wallsToMapString().c_str());
+    fflush(stdin);
+  }
+
+  virtual void onForwardComplete() {
+    onMoveComplete("forward");
+  }
+
+  virtual void onLeftComplete() {
+    onMoveComplete("left");
+  }
+
+  virtual void onRightComplete() {
+    onMoveComplete("right");
+  }
+
+  virtual void onBackwardComplete() {
+    onMoveComplete("backward");
+  }
+
+};
+
 int main(int argc, char *argv[]) {
+  // TODO: move robot inside EventHandler
   yolo::Robot robot;
+
+  EventHandler e(&robot);
+  robot.setListener(&e);
 
   const char *ip = "172.20.10.2", *port = "3000";
   if (3 <= argc) {
@@ -45,10 +88,10 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
+  // TODO: move this loop to EventHandler
   do {
     std::string line;
     if (haveStdin()) std::getline(std::cin, line);
-    // TODO: json parse
     if (line.find("q") != std::string::npos) {
       break;
     } else if (line.find("hello") != std::string::npos) {

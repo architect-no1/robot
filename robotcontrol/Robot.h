@@ -43,6 +43,21 @@ public:
 
   void runOneLoop();
 
+  void forwardComplete();
+  void leftComplete();
+  void rightComplete();
+  void backwardComplete();
+
+  class Listener {
+  public:
+    virtual void onForwardComplete() = 0;
+    virtual void onLeftComplete() = 0;
+    virtual void onRightComplete() = 0;
+    virtual void onBackwardComplete() = 0;
+  };
+
+  void setListener(Listener *l);
+
   void setWheelSpeed(int left, int right);
 
   void followLineForwardInit();
@@ -56,6 +71,7 @@ public:
   class Behavior;
 
 private:
+  Listener *listener;
   std::shared_ptr<Behavior> behavior;
 
   bool isPaused;
