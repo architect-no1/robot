@@ -53,18 +53,20 @@ int main(int argc, char *argv[]) {
       break;
     } else if (line.find("hello") != std::string::npos) {
       robot.hello();
+    } else if (line.find("init") != std::string::npos) {
+      robot.init();
     } else if (line.find("forward") != std::string::npos) {
       robot.goForward();
     } else if (line.find("left") != std::string::npos) {
-      robot.turnLeft();
+      robot.goLeft();
     } else if (line.find("right") != std::string::npos) {
-      robot.turnRight();
-    } else if (line.find("uturn") != std::string::npos) {
-      robot.uturn();
+      robot.goRight();
+    } else if (line.find("backward") != std::string::npos) {
+      robot.goBackward();
     } else if (line.find("check") != std::string::npos) {
       robot.checkSigns();
-    } else if (line.find("pause") != std::string::npos) {
-      robot.pause();
+    } else if (line.find("suspend") != std::string::npos) {
+      robot.suspend();
     } else if (line.find("resume") != std::string::npos) {
       robot.resume();
     } else if (line == "i") {

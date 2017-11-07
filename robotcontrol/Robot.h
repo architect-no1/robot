@@ -25,15 +25,15 @@ public:
 
   void hello();
 
+  void init();
+
   void goForward();
-  void turnLeft();
-  void turnRight();
-  void uturn();
+  void goLeft();
+  void goRight();
+  void goBackward();
 
-  void pause();
+  void suspend();
   void resume();
-
-  void stop();
 
   void checkSigns();
 
@@ -48,6 +48,8 @@ public:
   void followLineForwardInit();
   void followLineForward();
   void followLineForward(bool &foundCrossing);
+
+  void stop();
 
   Camera c;
 

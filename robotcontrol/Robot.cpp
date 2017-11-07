@@ -77,6 +77,12 @@ void Robot::hello() {
   ack("hello");
 }
 
+void Robot::init() {
+  behavior.reset();
+  // check starting point?
+  // do this with behavior?
+}
+
 void Robot::updateCamera() {
   IplImage *iplCamera = cvQueryFrame(capture);
   camera = cv::cvarrToMat(iplCamera);
@@ -99,10 +105,10 @@ bool Robot::isWallRight() {
   return sensor.right/10 < WALL_DISTANCE_MAX;
 }
 
-void Robot::pause() {
+void Robot::suspend() {
   setWheelSpeed(0, 0);
   isPaused = true;
-  ack("pause");
+  ack("suspend");
 }
 
 void Robot::resume() {
@@ -320,36 +326,36 @@ private:
   bool isLeft;
 };
 
-void Robot::turnLeft() {
+void Robot::goLeft() {
   if (behavior) return;
   behavior = std::make_shared<TurnBehavior>(this, true);
 }
 
-void Robot::turnRight() {
+void Robot::goRight() {
   if (behavior) return;
   behavior = std::make_shared<TurnBehavior>(this, false);
 }
 
-class UturnBehavior : public Robot::Behavior {
+class BackwardBehavior : public Robot::Behavior {
 public:
-  UturnBehavior(Robot* r) : Behavior(r),
-      ticks(0), state(UTURN1) { }
+  BackwardBehavior(Robot* r) : Behavior(r),
+      ticks(0), state(BACKWARD1) { }
 
-  ~UturnBehavior() {
-    ack("uturn");
+  ~BackwardBehavior() {
+    ack("backward");
   }
 
   virtual void tick() {
     ticks++;
     switch (state) {
-      case UTURN1:
+      case BACKWARD1:
         r->setWheelSpeed(-BASESPEED, 0);
         if (TICKS_TURN <= ticks) {
           ticks = 0;
-          state = UTURN2;
+          state = BACKWARD2;
         }
         break;
-      case UTURN2:
+      case BACKWARD2:
         r->setWheelSpeed(0, BASESPEED);
         if (TICKS_TURN <= ticks) {
           r->stop();
@@ -364,14 +370,14 @@ public:
 private:
   int ticks;
   enum {
-    UTURN1,
-    UTURN2,
+    BACKWARD1,
+    BACKWARD2,
   } state;
 };
 
-void Robot::uturn() {
+void Robot::goBackward() {
   if (behavior) return;
-  behavior = std::make_shared<UturnBehavior>(this);
+  behavior = std::make_shared<BackwardBehavior>(this);
 }
 
 class CheckSignBehavior : public Robot::Behavior {
