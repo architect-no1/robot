@@ -48,6 +48,11 @@ Robot::Robot()
     exit(0);
   }
 
+  if (initSign() != 0) {
+    log("log sign init fail\n");
+    exit(0);
+  }
+
   int width = 640;
   int height = 320;
   if (cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, width) == 0) {
@@ -485,10 +490,9 @@ public:
         }
         break;
       case MOVE_FRONT:
-        //r->setWheelSpeed(BASESPEED, BASESPEED);
         r->followLineForward();
         if (TICKS_CHECKSIGN_MOVE <= ticks) {
-          r->stop();
+          r->checkSignComplete(signForward, signLeft, signRight);
         }
         break;
       default:
@@ -518,6 +522,13 @@ private:
 void Robot::checkSigns() {
   if (behavior) return;
   behavior = std::make_shared<CheckSignBehavior>(this);
+}
+
+void Robot::checkSignComplete(std::string forward,
+                              std::string left,
+                              std::string right) {
+  if (listener) listener->onCheckSignComplete(forward, left, right);
+  stop();
 }
 
 } // namespace yolo

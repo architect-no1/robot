@@ -48,12 +48,20 @@ public:
   void rightComplete();
   void backwardComplete();
 
+  void checkSignComplete(std::string forward,
+                         std::string left,
+                         std::string right);
+
   class Listener {
   public:
     virtual void onForwardComplete() = 0;
     virtual void onLeftComplete() = 0;
     virtual void onRightComplete() = 0;
     virtual void onBackwardComplete() = 0;
+
+    virtual void onCheckSignComplete(std::string forward,
+                                     std::string left,
+                                     std::string right) = 0;
   };
 
   void setListener(Listener *l);

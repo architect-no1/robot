@@ -60,6 +60,19 @@ public:
     onMoveComplete("backward");
   }
 
+  virtual void onCheckSignComplete(std::string forward,
+                                   std::string left,
+                                   std::string right) {
+    std::string signmap = "";
+    if (0 < forward.length()) signmap += "dw" + forward + " ";
+    if (0 < left.length()) signmap += "da" + left + " ";
+    if (0 < right.length()) signmap += "dd" + right + " ";
+
+    if (0 == signmap.length()) {
+      // TODO: error
+    }
+  }
+
 };
 
 int main(int argc, char *argv[]) {
