@@ -35,7 +35,7 @@ public:
     ret = r->isWallFront() ? ". x . " : ". o . ";
     ret += r->isWallLeft() ? "x o "   : "o o ";
     ret += r->isWallRight()?     "x " :     "o ";
-    ret += ". . .";
+    ret += ". o .";
     return ret;
   }
 
@@ -109,6 +109,14 @@ int main(int argc, char *argv[]) {
       break;
     } else if (line.find("hello") != std::string::npos) {
       robot.hello();
+    } else if (line.find("current") != std::string::npos) {
+      std::string ret;
+      ret = robot.isWallFront() ? ". x . " : ". o . ";
+      ret += robot.isWallLeft() ? "x o "   : "o o ";
+      ret += robot.isWallRight()?     "x " :     "o ";
+      ret += ". - .";
+      printf("ack %s %s\n", "current", ret.c_str());
+      fflush(stdout);
     } else if (line.find("init") != std::string::npos) {
       robot.init();
     } else if (line.find("forward") != std::string::npos) {
