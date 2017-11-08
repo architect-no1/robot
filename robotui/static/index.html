@@ -1,0 +1,194 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="JM">
+
+    <title>CMU Architect Course Project</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="./css/dashboard.css" rel="stylesheet">
+    
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+  </head>
+
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#">Robot by <b>YOLO</b></a>
+    </header>
+
+    <div class="container-fluid">
+      <div class="row">
+        
+        <!-- Map Panel -->
+        <img src="image/robot.png" id="robotImage" style="display:none;">
+        <img src="image/arrowB.jpg" id="arrowBImage" style="display:none;">
+        <img src="image/arrowGo.jpg" id="arrowGoImage" style="display:none;">
+        <img src="image/arrowStop.jpg" id="arrowStopImage" style="display:none;">
+        <img src="image/arrowT.jpg" id="arrowTImage" style="display:none;">
+        <img src="image/arrowL.jpg" id="arrowLImage" style="display:none;">
+        <img src="image/arrowL45.jpg" id="arrowL45Image" style="display:none;">
+        <img src="image/arrowR.jpg" id="arrowRImage" style="display:none;">
+        <img src="image/arrowR45.jpg" id="arrowR45Image" style="display:none;">
+        <img src="image/arrow.jpg" id="arrowImage" style="display:none;">
+        
+        <div class="col rounded bg-info m-2 p-1">
+          <canvas id="mapCanvas" width="650" height="380"></canvas>
+        </div>
+        <div class="col m-1 p-1" >
+          
+          <!-- Notification Panel -->
+          <div class="alert alert-info" role="alert">
+              <span class="badge badge-primary">Connecting</span> &nbsp;&nbsp;
+            <strong>Please connect to ROBOT.</strong>
+          </div>
+          
+          <!-- Control Panel -->
+          <div class="col rounded border mt-2 p-1 pl-2 pb-2 bg-info">
+            <div>
+              <div><span class="badge badge-info">CONNECT</span></div>
+              <div class="input-group">
+                <span class="input-group-addon form-control-sm">IP</span>
+                <input type="text" class="form-control form-control-sm col-4" id="ipInput">
+                <span class="input-group-btn">
+                  <button class="btn btn-dark btn-sm" type="button" id="connectButton">Connect</button>
+                </span>
+              </div>
+            </div>
+
+            <div class="mt-1">
+              <span class="badge badge-info">MODE</span>
+              <div>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-dark btn-sm" id="autoButton">Autonomous</button>
+                  <button type="button" class="btn btn-primary btn-sm" id="manualButton">Manual</button>
+                </div>
+                &nbsp; &nbsp;
+                <button class="btn btn-sm btn-danger dropdown-toggle" type="button" id="emulationButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Emulation
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <a class="dropdown-item" id="emul_2x2">2x2</a>
+                  <a class="dropdown-item" id="emul_2x2_empty">2x2 EMPTY</a>
+                  <a class="dropdown-item" id="emul_4x4">4x4</a>
+                  <a class="dropdown-item" id="emul_6x4">6x4</a>
+                  <a class="dropdown-item" id="emul_6x4_empty">6x4 EMPTY</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" id="emul_stop">STOP</a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-1">
+              <span class="badge badge-info">MOVE</span>
+              <div>
+              <div class="btn-group">
+              <button type="button" class="btn btn-danger btn-sm" id="initButton">INIT</button>
+              <button type="button" class="btn btn-dark btn-sm" id="leftButton">LEFT</button>
+              <button type="button" class="btn btn-dark btn-sm" id="forwardButton">FOWARD</button>
+              <button type="button" class="btn btn-dark btn-sm" id="rightButton">RIGHT</button>
+              <button type="button" class="btn btn-dark btn-sm" id="uturnButton">U-TURN</button>
+              <button type="button" class="btn btn-primary btn-sm" id="stopButton">STOP</button>
+              </div>
+              </div>
+            </div>
+            
+<!--            
+            <div class="mt-1">
+              <div><span class="badge badge-info">CAMERA</span></div>
+              <div class="input-group">
+                <span class="input-group-btn">
+                  <button class="btn btn-dark btn-sm" type="button">Up</button>
+                </span>
+                <input type="text" class="form-control form-control-sm col-1" aria-label="Amount (to the nearest dollar)">
+                <span class="input-group-btn">
+                  <button class="btn btn-dark btn-sm" type="button">Down</button>
+                </span>
+                &nbsp;&nbsp;&nbsp;
+                <span class="input-group-btn">
+                  <button class="btn btn-dark btn-sm" type="button">Left</button>
+                </span>
+                <input type="text" class="form-control form-control-sm col-1" aria-label="Amount (to the nearest dollar)">
+                <span class="input-group-btn">
+                  <button class="btn btn-dark btn-sm" type="button">Right</button>
+                </span>
+              </div>
+            </div>
+-->
+<!--            
+            <div class="mt-1">
+              <div><span class="badge badge-info">SPEED</span></div>
+              <div class="input-group">
+                <span class="input-group-btn">
+                  <button class="btn btn-dark btn-sm" type="button">Up</button>
+                </span>
+                <input type="text" class="form-control form-control-sm col-2" aria-label="Amount (to the nearest dollar)">
+                <span class="input-group-btn">
+                  <button class="btn btn-dark btn-sm" type="button">Down</button>
+                </span>
+              </div>
+            </div>
+-->            
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <!-- Camera Panel -->
+        <div class="rounded bg-dark m-2 p-2 col">
+          <!--<img class="rounded mx-auto d-block" src="https://dummyimage.com/320x240/000/fff" id="cameraImage">-->
+          <canvas id="smallMapCanvas" width="320" height="240"></canvas>
+        </div>
+            
+        <!-- Status Panel -->
+        <div class="rounded bg-dark m-2 p-1 col">
+          <div class="text-md-right mb-1">
+            <button class="badge btn btn-info btn-sm" type="button">Refresh</button>
+          </div>
+<pre class="small text-white p-2">
+Distance Sensor : <font class="text-warning">20 mm</font>
+Right Sensor : <font class="text-warning">20 mm</font>
+Left Sensor : <font class="text-warning">20 mm</font>
+Some Sensor : <font class="text-warning">...</font>
+Some Sensor : <font class="text-warning">...</font>
+Some Sensor : <font class="text-warning">...</font>
+Some Sensor : <font class="text-warning">...</font>
+</pre>
+        </div>
+        
+        <!-- Log Panel -->
+        <div class="rounded bg-dark m-2 p-1 col-6">
+          <div class="text-md-right mb-1">
+            <button class="badge btn btn-info btn-sm" type="button">Save</button>
+            <button class="badge btn btn-info btn-sm" type="button" id="logClearButton">Clear</button>
+          </div>
+<pre class="small text-white pre-scrollable logHeight" id="logPanel">
+<font class="text-warning">CMU Robot Project</font> by YOLO 
+</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <script src="./js/popper.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/mows.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/map.js"></script>
+    <script src="./js/emulation.js"></script>
+    <script src="./js/algorithm_righthand.js"></script>
+    <script src="./js/algorithm.js"></script>
+    <script src="./js/mapdraw.js"></script>
+  </body>
+</html>
