@@ -32,9 +32,9 @@ public:
 
   std::string wallsToMapString() {
     std::string ret;
-    ret = r->isWallFront() ? ". X . " : ". O . ";
-    ret += r->isWallLeft() ? "X O "   : "O O ";
-    ret += r->isWallRight()?     "X " :     "O ";
+    ret = r->isWallFront() ? ". x . " : ". o . ";
+    ret += r->isWallLeft() ? "x o "   : "o o ";
+    ret += r->isWallRight()?     "x " :     "o ";
     ret += ". . .";
     return ret;
   }
