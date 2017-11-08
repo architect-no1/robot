@@ -64,9 +64,12 @@ public:
                                    std::string left,
                                    std::string right) {
     std::string signmap = "";
-    if (0 < forward.length()) signmap += "dw" + forward + " ";
-    if (0 < left.length()) signmap += "da" + left + " ";
-    if (0 < right.length()) signmap += "dd" + right + " ";
+    if (0 < forward.length()) signmap += "w" + forward;
+    else if (0 < left.length()) signmap += "a" + left;
+    else if (0 < right.length()) signmap += "d" + right;
+
+    printf("ack sign %s\n", signmap.c_str());
+    fflush(stdout);
 
     if (0 == signmap.length()) {
       // TODO: error
@@ -129,7 +132,7 @@ int main(int argc, char *argv[]) {
       robot.goRight();
     } else if (line.find("backward") != std::string::npos) {
       robot.goBackward();
-    } else if (line.find("check") != std::string::npos) {
+    } else if (line.find("sign") != std::string::npos) {
       robot.checkSigns();
     } else if (line.find("suspend") != std::string::npos) {
       robot.suspend();
