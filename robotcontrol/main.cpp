@@ -125,11 +125,26 @@ int main(int argc, char *argv[]) {
     } else if (line.find("init") != std::string::npos) {
       robot.init();
     } else if (line.find("forward") != std::string::npos) {
-      robot.goForward();
+      if (robot.isWallFront()) {
+        printf("ack forward cannot\n");
+        fflush(stdout);
+      } else {
+        robot.goForward();
+      }
     } else if (line.find("left") != std::string::npos) {
-      robot.goLeft();
+      if (robot.isWallLeft()) {
+        printf("ack left cannot\n");
+        fflush(stdout);
+      } else {
+        robot.goLeft();
+      }
     } else if (line.find("right") != std::string::npos) {
-      robot.goRight();
+      if (robot.isWallRight()) {
+        printf("ack right cannot\n");
+        fflush(stdout);
+      } else {
+        robot.goRight();
+      }
     } else if (line.find("backward") != std::string::npos) {
       robot.goBackward();
     } else if (line.find("sign") != std::string::npos) {
