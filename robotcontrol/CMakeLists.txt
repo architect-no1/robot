@@ -21,15 +21,15 @@ ADD_LIBRARY(sensor ${SENSOR_SOURCES})
 TARGET_LINK_LIBRARIES(sensor ${SENSOR_LIBS})
 
 SET(ROBOT_SOURCES Robot.cpp ImageProcessing.cpp PID.cpp Signs.cpp Camera.cpp
-  ${DEMOPATH}/Common/Servos.cpp
-	${DEMOPATH}/Common/NetworkUDP.cpp
-	${DEMOPATH}/Common/UdpSendRecvJpeg.cpp
+  demo/Common/Servos.cpp
+  demo/Common/NetworkUDP.cpp
+  demo/Common/UdpSendRecvJpeg.cpp
 )
 SET(ROBOT_LIBS sensor)
 
 #move to Camera
 INCLUDE_DIRECTORIES(
-  ${DEMOPATH}/Common/
+  demo/Common/
 	/home/pi/git/robidouille/raspicam_cv
 )
 LINK_DIRECTORIES(
