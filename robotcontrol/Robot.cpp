@@ -96,7 +96,7 @@ void Robot::updateCamera() {
 }
 
 bool Robot::isWallFront() {
-#define WALL_DISTANCE_MAX 10
+#define WALL_DISTANCE_MAX 15
   //return false;
   return sensor.front < WALL_DISTANCE_MAX;
 }
