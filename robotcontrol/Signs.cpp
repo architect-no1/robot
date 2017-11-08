@@ -3,7 +3,7 @@
 #if  defined(_WIN32) || defined(_WIN64)
 #define IMAGE_DIR "signs\\"
 #else
-#define IMAGE_DIR "../../TestOpenCvSigns/signs/"
+#define IMAGE_DIR "./signs/"
 #endif
 
 
