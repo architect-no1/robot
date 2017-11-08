@@ -109,6 +109,8 @@ int main(int argc, char *argv[]) {
       break;
     } else if (line.find("hello") != std::string::npos) {
       robot.hello();
+      printf("ack hello\n");
+      fflush(stdout);
     } else if (line.find("current") != std::string::npos) {
       std::string ret;
       ret = robot.isWallFront() ? ". x . " : ". o . ";

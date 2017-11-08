@@ -13,11 +13,6 @@
 #include "debug.h"
 
 #define log(...) fprintf(stderr, __VA_ARGS__)
-#define ack(_b) \
-  do {\
-    fprintf(stdout, "ack " _b "\n" );\
-    fflush(stdout);\
-  } while (0)\
 
 namespace yolo {
 
@@ -80,7 +75,6 @@ cv::Mat& Robot::getCamera() {
 }
 
 void Robot::hello() {
-  ack("hello");
 }
 
 void Robot::init() {
@@ -114,12 +108,10 @@ bool Robot::isWallRight() {
 void Robot::suspend() {
   setWheelSpeed(0, 0);
   isPaused = true;
-  ack("suspend");
 }
 
 void Robot::resume() {
   isPaused = false;
-  ack("resume");
 }
 
 class Robot::Behavior {
@@ -290,9 +282,8 @@ public:
   }
 
   ~TurnBehavior() {
-    if (isLeft) ack("left");
-    else ack("right");
   }
+
   virtual void tick() {
     ticks++;
     switch (state) {
@@ -418,11 +409,6 @@ public:
     r->followLineForwardInit();
   }
   ~CheckSignBehavior() {
-    printf("%s, %s, %s\n",
-        signForward.c_str(),
-        signLeft.c_str(),
-        signRight.c_str());
-    ack("check");
   }
 
   virtual void tick() {
