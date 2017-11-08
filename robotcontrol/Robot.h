@@ -25,15 +25,15 @@ public:
 
   void hello();
 
+  void init();
+
   void goForward();
-  void turnLeft();
-  void turnRight();
-  void uturn();
+  void goLeft();
+  void goRight();
+  void goBackward();
 
-  void pause();
+  void suspend();
   void resume();
-
-  void stop();
 
   void checkSigns();
 
@@ -43,17 +43,43 @@ public:
 
   void runOneLoop();
 
+  void forwardComplete();
+  void leftComplete();
+  void rightComplete();
+  void backwardComplete();
+
+  void checkSignComplete(std::string forward,
+                         std::string left,
+                         std::string right);
+
+  class Listener {
+  public:
+    virtual void onForwardComplete() = 0;
+    virtual void onLeftComplete() = 0;
+    virtual void onRightComplete() = 0;
+    virtual void onBackwardComplete() = 0;
+
+    virtual void onCheckSignComplete(std::string forward,
+                                     std::string left,
+                                     std::string right) = 0;
+  };
+
+  void setListener(Listener *l);
+
   void setWheelSpeed(int left, int right);
 
   void followLineForwardInit();
   void followLineForward();
   void followLineForward(bool &foundCrossing);
 
+  void stop();
+
   Camera c;
 
   class Behavior;
 
 private:
+  Listener *listener;
   std::shared_ptr<Behavior> behavior;
 
   bool isPaused;

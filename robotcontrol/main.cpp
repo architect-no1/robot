@@ -23,8 +23,64 @@ static bool haveStdin() {
   return 0 < ret;
 }
 
+class EventHandler : public yolo::Robot::Listener {
+private:
+  yolo::Robot *r;
+
+public:
+  EventHandler(yolo::Robot *robot) : r(robot) { }
+
+  std::string wallsToMapString() {
+    std::string ret;
+    ret = r->isWallFront() ? ". X . " : ". O . ";
+    ret += r->isWallLeft() ? "X O "   : "O O ";
+    ret += r->isWallRight()?     "X " :     "O ";
+    ret += ". . .";
+    return ret;
+  }
+
+  void onMoveComplete(const char *move) {
+    printf("ack %s %s\n", move, wallsToMapString().c_str());
+    fflush(stdin);
+  }
+
+  virtual void onForwardComplete() {
+    onMoveComplete("forward");
+  }
+
+  virtual void onLeftComplete() {
+    onMoveComplete("left");
+  }
+
+  virtual void onRightComplete() {
+    onMoveComplete("right");
+  }
+
+  virtual void onBackwardComplete() {
+    onMoveComplete("backward");
+  }
+
+  virtual void onCheckSignComplete(std::string forward,
+                                   std::string left,
+                                   std::string right) {
+    std::string signmap = "";
+    if (0 < forward.length()) signmap += "dw" + forward + " ";
+    if (0 < left.length()) signmap += "da" + left + " ";
+    if (0 < right.length()) signmap += "dd" + right + " ";
+
+    if (0 == signmap.length()) {
+      // TODO: error
+    }
+  }
+
+};
+
 int main(int argc, char *argv[]) {
+  // TODO: move robot inside EventHandler
   yolo::Robot robot;
+
+  EventHandler e(&robot);
+  robot.setListener(&e);
 
   const char *ip = "172.20.10.2", *port = "3000";
   if (3 <= argc) {
@@ -45,26 +101,28 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
+  // TODO: move this loop to EventHandler
   do {
     std::string line;
     if (haveStdin()) std::getline(std::cin, line);
-    // TODO: json parse
     if (line.find("q") != std::string::npos) {
       break;
     } else if (line.find("hello") != std::string::npos) {
       robot.hello();
+    } else if (line.find("init") != std::string::npos) {
+      robot.init();
     } else if (line.find("forward") != std::string::npos) {
       robot.goForward();
     } else if (line.find("left") != std::string::npos) {
-      robot.turnLeft();
+      robot.goLeft();
     } else if (line.find("right") != std::string::npos) {
-      robot.turnRight();
-    } else if (line.find("uturn") != std::string::npos) {
-      robot.uturn();
+      robot.goRight();
+    } else if (line.find("backward") != std::string::npos) {
+      robot.goBackward();
     } else if (line.find("check") != std::string::npos) {
       robot.checkSigns();
-    } else if (line.find("pause") != std::string::npos) {
-      robot.pause();
+    } else if (line.find("suspend") != std::string::npos) {
+      robot.suspend();
     } else if (line.find("resume") != std::string::npos) {
       robot.resume();
     } else if (line == "i") {

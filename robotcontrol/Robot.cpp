@@ -28,7 +28,8 @@ namespace yolo {
 #define BASESPEEDFUDGEFACTOR 0.80   // default 1.25
 
 Robot::Robot()
-    : isPaused(false)
+    : listener(NULL)
+    , isPaused(false)
     , capture(NULL) {
   // pan tilt
   if (OpenServos() == -1) {
@@ -44,6 +45,11 @@ Robot::Robot()
   capture = cvCreateCameraCapture(0);   // Open default Camera
   if(!capture) {
     log("log camera init fail\n");
+    exit(0);
+  }
+
+  if (initSign() != 0) {
+    log("log sign init fail\n");
     exit(0);
   }
 
@@ -77,6 +83,12 @@ void Robot::hello() {
   ack("hello");
 }
 
+void Robot::init() {
+  behavior.reset();
+  // check starting point?
+  // do this with behavior?
+}
+
 void Robot::updateCamera() {
   IplImage *iplCamera = cvQueryFrame(capture);
   camera = cv::cvarrToMat(iplCamera);
@@ -99,10 +111,10 @@ bool Robot::isWallRight() {
   return sensor.right/10 < WALL_DISTANCE_MAX;
 }
 
-void Robot::pause() {
+void Robot::suspend() {
   setWheelSpeed(0, 0);
   isPaused = true;
-  ack("pause");
+  ack("suspend");
 }
 
 void Robot::resume() {
@@ -126,6 +138,10 @@ void Robot::runOneLoop() {
 
 void Robot::setWheelSpeed(int left, int right) {
   SetWheelSpeed(left, right);
+}
+
+void Robot::setListener(Listener *l) {
+  listener = l;
 }
 
 void Robot::stop() {
@@ -214,7 +230,6 @@ public:
   ~ForwardBehavior() {
     timeend();
     timediff();
-    ack("forward");
   }
 
   virtual void tick() {
@@ -229,6 +244,7 @@ public:
           ticks = 0;
         }
         if (TICKS_BEFORE_CROSSING_GUARD <= ticks) {
+          // TODO: error
           r->stop();
         }
       }
@@ -236,7 +252,7 @@ public:
       case AFTER_CROSSING:
         r->followLineForward();
         if (TICKS_AFTER_CROSSING <= ticks) {
-          r->stop();
+          r->forwardComplete();
         }
       break;
       default:
@@ -259,6 +275,11 @@ private:
 void Robot::goForward() {
   if (behavior) return;
   behavior = std::make_shared<ForwardBehavior>(this);
+}
+
+void Robot::forwardComplete() {
+  if (listener) listener->onForwardComplete();
+  stop();
 }
 
 class TurnBehavior : public Robot::Behavior {
@@ -294,6 +315,7 @@ public:
           ticks = 0;
         }
         if (TICKS_BEFORE_CROSSING_GUARD <= ticks) {
+          // TODO: error
           r->stop();
         }
       }
@@ -301,7 +323,8 @@ public:
       case AFTER_CROSSING:
         r->followLineForward();
         if (TICKS_AFTER_CROSSING <= ticks) {
-          r->stop();
+          if (isLeft) r->leftComplete();
+          else r->rightComplete();
         }
         break;
       default:
@@ -320,39 +343,48 @@ private:
   bool isLeft;
 };
 
-void Robot::turnLeft() {
+void Robot::goLeft() {
   if (behavior) return;
   behavior = std::make_shared<TurnBehavior>(this, true);
 }
 
-void Robot::turnRight() {
+void Robot::leftComplete() {
+  if (listener) listener->onLeftComplete();
+  stop();
+}
+
+void Robot::goRight() {
   if (behavior) return;
   behavior = std::make_shared<TurnBehavior>(this, false);
 }
 
-class UturnBehavior : public Robot::Behavior {
-public:
-  UturnBehavior(Robot* r) : Behavior(r),
-      ticks(0), state(UTURN1) { }
+void Robot::rightComplete() {
+  if (listener) listener->onRightComplete();
+  stop();
+}
 
-  ~UturnBehavior() {
-    ack("uturn");
+class BackwardBehavior : public Robot::Behavior {
+public:
+  BackwardBehavior(Robot* r) : Behavior(r),
+      ticks(0), state(BACKWARD1) { }
+
+  ~BackwardBehavior() {
   }
 
   virtual void tick() {
     ticks++;
     switch (state) {
-      case UTURN1:
+      case BACKWARD1:
         r->setWheelSpeed(-BASESPEED, 0);
         if (TICKS_TURN <= ticks) {
           ticks = 0;
-          state = UTURN2;
+          state = BACKWARD2;
         }
         break;
-      case UTURN2:
+      case BACKWARD2:
         r->setWheelSpeed(0, BASESPEED);
         if (TICKS_TURN <= ticks) {
-          r->stop();
+          r->backwardComplete();
         }
         break;
       default:
@@ -364,14 +396,19 @@ public:
 private:
   int ticks;
   enum {
-    UTURN1,
-    UTURN2,
+    BACKWARD1,
+    BACKWARD2,
   } state;
 };
 
-void Robot::uturn() {
+void Robot::goBackward() {
   if (behavior) return;
-  behavior = std::make_shared<UturnBehavior>(this);
+  behavior = std::make_shared<BackwardBehavior>(this);
+}
+
+void Robot::backwardComplete() {
+  if (listener) listener->onBackwardComplete();
+  stop();
 }
 
 class CheckSignBehavior : public Robot::Behavior {
@@ -453,10 +490,9 @@ public:
         }
         break;
       case MOVE_FRONT:
-        //r->setWheelSpeed(BASESPEED, BASESPEED);
         r->followLineForward();
         if (TICKS_CHECKSIGN_MOVE <= ticks) {
-          r->stop();
+          r->checkSignComplete(signForward, signLeft, signRight);
         }
         break;
       default:
@@ -486,6 +522,13 @@ private:
 void Robot::checkSigns() {
   if (behavior) return;
   behavior = std::make_shared<CheckSignBehavior>(this);
+}
+
+void Robot::checkSignComplete(std::string forward,
+                              std::string left,
+                              std::string right) {
+  if (listener) listener->onCheckSignComplete(forward, left, right);
+  stop();
 }
 
 } // namespace yolo

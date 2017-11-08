@@ -3,7 +3,7 @@
 #if  defined(_WIN32) || defined(_WIN64)
 #define IMAGE_DIR "signs\\"
 #else
-#define IMAGE_DIR "../TestOpenCvSigns/signs/"
+#define IMAGE_DIR "../../TestOpenCvSigns/signs/"
 #endif
 
 
@@ -100,25 +100,25 @@ static int readRefImages(Symbol *symbols)
 	if (!symbols[0].img.data)
 		return -1;
 	threshold(symbols[0].img, symbols[0].img, 100, 255, 0);
-	symbols[0].name = "Left 90";
+	symbols[0].name = "5";
 
 	symbols[1].img = imread(IMAGE_DIR"arrowR.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	if (!symbols[1].img.data)
 		return -1;
 	threshold(symbols[1].img, symbols[1].img, 100, 255, 0);
-	symbols[1].name = "Right 90";
+	symbols[1].name = "7";
 
 	symbols[2].img = imread(IMAGE_DIR"arrowT.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	if (!symbols[2].img.data)
 		return -1;
 	threshold(symbols[2].img, symbols[2].img, 100, 255, 0);
-	symbols[2].name = "Turn Around";
+	symbols[2].name = "4";
 
 	symbols[3].img = imread(IMAGE_DIR"arrowS.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	if (!symbols[3].img.data)
 		return -1;
 	threshold(symbols[3].img, symbols[3].img, 100, 255, 0);
-	symbols[3].name = "Straight";
+	symbols[3].name = "9";
 
 	symbols[4].img = imread(IMAGE_DIR"arrowPush.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	if (!symbols[4].img.data)
@@ -130,31 +130,31 @@ static int readRefImages(Symbol *symbols)
 	if (!symbols[5].img.data)
 		return -1;
 	threshold(symbols[5].img, symbols[5].img, 100, 255, 0);
-	symbols[5].name = "Stop";
+	symbols[5].name = "3";
 
 	symbols[6].img = imread(IMAGE_DIR"arrowB.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	if (!symbols[6].img.data)
 		return -1;
 	threshold(symbols[6].img, symbols[6].img, 100, 255, 0);
-	symbols[6].name = "Ball";
+	symbols[6].name = "1";
 
 	symbols[7].img = imread(IMAGE_DIR"arrowL45.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	if (!symbols[7].img.data)
 		return -1;
 	threshold(symbols[7].img, symbols[7].img, 100, 255, 0);
-	symbols[7].name = "Left 45";
+	symbols[7].name = "6";
 
 	symbols[8].img = imread(IMAGE_DIR"arrowR45.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	if (!symbols[8].img.data)
 		return -1;
 	threshold(symbols[8].img, symbols[8].img, 100, 255, 0);
-	symbols[8].name = "Right 45";
+	symbols[8].name = "8";
 
 	symbols[9].img = imread(IMAGE_DIR"arrowGo.jpg", CV_LOAD_IMAGE_GRAYSCALE);
 	if (!symbols[9].img.data)
 		return -1;
 	threshold(symbols[9].img, symbols[9].img, 100, 255, 0);
-	symbols[9].name = "Go";
+	symbols[9].name = "2";
 
 	return 0;
 }
@@ -196,7 +196,7 @@ std::string getSign(cv::Mat& camera) {
 
   /// Detect edges using canny
   //med = median(greyImg);
-  med = 120.0;
+  med = 50.0;
   lower = int(max(0, (int)((1.0 - sigma) * med)));
   upper = int(min(255, (int)((1.0 + sigma) * med)));
   Canny(greyImg, canny_output, lower, upper);
@@ -211,8 +211,6 @@ std::string getSign(cv::Mat& camera) {
 
   vector<Point> approxRect;
 
-  int maxsizeIndex = -1;
-  float maxsize = 0;
   size_t i;
   for (i = 0; i < contours.size(); i++) {
 
@@ -222,13 +220,8 @@ std::string getSign(cv::Mat& camera) {
     if (approxRect.size() == 4) {
       double area = contourArea(contours[i]);
       //printf("area[%d] %f\n", i, area);
-      if (maxsize < area) {
-	maxsizeIndex = i;
-	maxsize = area;
-      }
-
       // area threshold 2000 for 640*480
-      if (area > 300)
+      if (area > 500)
 
       {
         std::vector<cv::Point2f> corners;
@@ -279,7 +272,7 @@ std::string getSign(cv::Mat& camera) {
 
         threshold(correctedImgBin, correctedImgBin, 140, 255, 0);
 
-        if (!IsPi3) imshow("B", correctedImgBin);
+        //if (!IsPi3) imshow("B", correctedImgBin);
 
 
         double minVal, maxVal, medVal;
@@ -291,7 +284,7 @@ std::string getSign(cv::Mat& camera) {
 
         threshold(new_image, new_image, medVal, 255, 0);
 
-        if (!IsPi3) imshow("C", new_image);
+        //if (!IsPi3) imshow("C", new_image);
 
         Mat diffImg;
 
@@ -322,8 +315,10 @@ std::string getSign(cv::Mat& camera) {
 
 
         if (match != -1) {
+          /*
           putText(camera, symbols[match].name, Point(320, 30), 1,
             2, Scalar(0, 255, 0), 2);
+            */
           printf("Match %s\n", symbols[match].name.c_str());
 					return symbols[match].name;
 					//return symbols[match].name.c_str();
