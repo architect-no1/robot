@@ -2,8 +2,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 
 PROJECT(yolo)
 
-SET(DEMOPATH ../..)
-
 ADD_DEFINITIONS(-std=c++11)
 SET(SENSOR_SOURCES Sensor.cpp
   demo/HC-SR04/Sonar.cpp
@@ -11,9 +9,9 @@ SET(SENSOR_SOURCES Sensor.cpp
 SET(SENSOR_LIBS wiringPi vl53l0x pthread)
 
 INCLUDE_DIRECTORIES(
-  ${DEMOPATH}/VL53L0X_TCA9548A_rasp-master/
-	${DEMOPATH}/VL53L0X_TCA9548A_rasp-master/Api/core/inc
-	${DEMOPATH}/VL53L0X_TCA9548A_rasp-master/platform/inc
+  demo/VL53L0X_TCA9548A_rasp-master/
+	demo/VL53L0X_TCA9548A_rasp-master/Api/core/inc
+	demo/VL53L0X_TCA9548A_rasp-master/platform/inc
   demo/HC-SR04
 )
 
