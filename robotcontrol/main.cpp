@@ -41,7 +41,7 @@ public:
 
   void onMoveComplete(const char *move) {
     printf("ack %s %s\n", move, wallsToMapString().c_str());
-    fflush(stdin);
+    fflush(stdout);
   }
 
   virtual void onForwardComplete() {
