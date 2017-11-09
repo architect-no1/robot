@@ -43,7 +43,7 @@ public:
 
   void runOneLoop();
 
-  void forwardComplete();
+  void forwardComplete(bool isRedDot);
   void leftComplete();
   void rightComplete();
   void backwardComplete();
@@ -54,7 +54,7 @@ public:
 
   class Listener {
   public:
-    virtual void onForwardComplete() = 0;
+    virtual void onForwardComplete(bool isRedDot) = 0;
     virtual void onLeftComplete() = 0;
     virtual void onRightComplete() = 0;
     virtual void onBackwardComplete() = 0;

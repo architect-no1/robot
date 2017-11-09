@@ -212,7 +212,7 @@ void Robot::followLineForward(bool &foundCrossing) {
 class ForwardBehavior : public Robot::Behavior {
 public:
   ForwardBehavior(Robot* r) : Behavior(r),
-      ticks(0), state(BEFORE_CROSSING) {
+      ticks(0), state(BEFORE_CROSSING), isRedDot(false) {
     //FIXME: may cause problem on how command is queued. create init state?
     r->followLineForwardInit();
 
@@ -228,10 +228,10 @@ public:
     ticks++;
     switch (state) {
       case BEFORE_CROSSING: {
-        bool foundRed = findRed(r->getCamera());
+        isRedDot |= findRed(r->getCamera());
         bool foundCrossing = false;
         r->followLineForward(foundCrossing);
-        if (foundRed || foundCrossing) {
+        if (isRedDot || foundCrossing) {
           state = AFTER_CROSSING;
           ticks = 0;
         }
@@ -242,9 +242,10 @@ public:
       }
       break;
       case AFTER_CROSSING:
+        isRedDot |= findRed(r->getCamera());
         r->followLineForward();
         if (TICKS_AFTER_CROSSING <= ticks) {
-          r->forwardComplete();
+          r->forwardComplete(isRedDot);
         }
       break;
       default:
@@ -259,6 +260,7 @@ private:
     BEFORE_CROSSING,
     AFTER_CROSSING,
   } state;
+  bool isRedDot;
 };
 
 // NOTE: goForwardInternal?
@@ -269,8 +271,8 @@ void Robot::goForward() {
   behavior = std::make_shared<ForwardBehavior>(this);
 }
 
-void Robot::forwardComplete() {
-  if (listener) listener->onForwardComplete();
+void Robot::forwardComplete(bool isRedDot) {
+  if (listener) listener->onForwardComplete(isRedDot);
   stop();
 }
 

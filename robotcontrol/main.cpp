@@ -30,22 +30,23 @@ private:
 public:
   EventHandler(yolo::Robot *robot) : r(robot) { }
 
-  std::string wallsToMapString() {
+  std::string wallsToMapString(bool isRedDot = false) {
     std::string ret;
     ret = r->isWallFront() ? ". x . " : ". o . ";
-    ret += r->isWallLeft() ? "x o "   : "o o ";
+    ret += r->isWallLeft() ? "x "     : "o ";
+    ret += isRedDot ?          "j "   :   "o ";
     ret += r->isWallRight()?     "x " :     "o ";
     ret += ". o .";
     return ret;
   }
 
-  void onMoveComplete(const char *move) {
-    printf("ack %s %s\n", move, wallsToMapString().c_str());
+  void onMoveComplete(const char *move, bool isRedDot = false) {
+    printf("ack %s %s\n", move, wallsToMapString(isRedDot).c_str());
     fflush(stdout);
   }
 
-  virtual void onForwardComplete() {
-    onMoveComplete("forward");
+  virtual void onForwardComplete(bool isRedDot) {
+    onMoveComplete("forward", isRedDot);
   }
 
   virtual void onLeftComplete() {
