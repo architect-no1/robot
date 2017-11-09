@@ -150,8 +150,10 @@ int main(int argc, char *argv[]) {
       robot.goBackward();
     } else if (line.find("sign") != std::string::npos) {
       robot.checkSigns();
-    } else if (line.find("suspend") != std::string::npos) {
-      robot.suspend();
+    } else if (line.find("pause") != std::string::npos) {
+      robot.pause();
+      printf("ack pause\n");
+      fflush(stdout);
     } else if (line.find("resume") != std::string::npos) {
       robot.resume();
     } else if (line == "i") {

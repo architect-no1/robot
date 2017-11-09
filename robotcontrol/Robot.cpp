@@ -105,7 +105,7 @@ bool Robot::isWallRight() {
   return sensor.right/10 < WALL_DISTANCE_MAX;
 }
 
-void Robot::suspend() {
+void Robot::pause() {
   setWheelSpeed(0, 0);
   isPaused = true;
 }

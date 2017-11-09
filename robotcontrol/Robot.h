@@ -32,7 +32,7 @@ public:
   void goRight();
   void goBackward();
 
-  void suspend();
+  void pause();
   void resume();
 
   void checkSigns();
