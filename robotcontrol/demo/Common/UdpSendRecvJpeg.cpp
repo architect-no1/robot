@@ -18,8 +18,16 @@ static  std::vector<uchar> sendbuff;//buffer for coding
 //-----------------------------------------------------------------
 int UdpSendImageAsJpeg(TUdpLocalPort * UdpLocalPort,TUdpDest *dest,cv::Mat Image)
 {
-    
+    const char * pipeName = "/home/pi/robot/bin/pipe";
+
     cv::imencode(".jpg", Image, sendbuff, param);
+    if (access(pipeName, F_OK) != -1) {
+        FILE *pFile = fopen(pipeName, "wnb");
+        if (pFile){
+            fwrite(sendbuff.data(), 1, sendbuff.size(), pFile);
+            fclose(pFile);
+        }
+    }
     return(SendUDPMsg(UdpLocalPort,dest,sendbuff.data(), sendbuff.size()));
 }
 
