@@ -1,7 +1,8 @@
 $(document).ready(function(){
 
   drawMap = function(mapWidth, mapHeight, mapString, id="mapCanvas", smallMode = false) {
-    //appendLog(DRAW, "draw map", true);
+    
+    console.log(DRAW, mapWidth, mapHeight, mapString);
 
     // initialize variables
     var canvas = document.getElementById(id);
@@ -123,7 +124,7 @@ $(document).ready(function(){
       context.stroke();
       
       // draw red dot
-      if (data[1][1].charAt(0) == 'd') {
+      if (data[1][1].charAt(0) == 'j') {
         var radius = blockSize / 9;
         context.beginPath();
         context.arc(startX + blockSize / 2, startY + blockSize / 2, radius, 0, Math.PI * 2, false);

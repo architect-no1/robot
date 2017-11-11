@@ -25,6 +25,30 @@
         <a class="navbar-brand" href="#">Robot by <b>YOLO</b></a>
     </header>
 
+    <!-- Disconnect Modal -->
+    <div class="modal fade" id="disconnectModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="exampleModalLabel">Notification</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="mx-auto">
+		        <p class="text-center">
+            <h1>Network Disconnected</h1>
+            <div class="text-center"><image src="image/disconnect.png" class="text-center"></div>
+		        </p>
+          </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+		        <button type="button" class="btn btn-primary">Reconnect</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
     <div class="container-fluid">
       <div class="row">
         
@@ -79,7 +103,7 @@
                   <a class="dropdown-item" id="emul_2x2">2x2</a>
                   <a class="dropdown-item" id="emul_2x2_empty">2x2 EMPTY</a>
                   <a class="dropdown-item" id="emul_4x4">4x4</a>
-                  <a class="dropdown-item" id="emul_6x4">6x4</a>
+                  <a class="dropdown-item" id="emul_6x4">6x4 Project Requirement</a>
                   <a class="dropdown-item" id="emul_6x4_empty">6x4 EMPTY</a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" id="emul_stop">STOP</a>
@@ -90,14 +114,19 @@
             <div class="mt-1">
               <span class="badge badge-info">MOVE</span>
               <div>
-              <div class="btn-group">
-              <button type="button" class="btn btn-danger btn-sm" id="initButton">INIT</button>
-              <button type="button" class="btn btn-dark btn-sm" id="leftButton">LEFT</button>
-              <button type="button" class="btn btn-dark btn-sm" id="forwardButton">FOWARD</button>
-              <button type="button" class="btn btn-dark btn-sm" id="rightButton">RIGHT</button>
-              <button type="button" class="btn btn-dark btn-sm" id="uturnButton">U-TURN</button>
-              <button type="button" class="btn btn-primary btn-sm" id="stopButton">STOP</button>
-              </div>
+	              <div class="btn-group">
+		              <button type="button" class="btn btn-dark btn-sm" id="currentButton">CURRENT</button>
+		              <button type="button" class="btn btn-dark btn-sm" id="leftButton">LEFT</button>
+		              <button type="button" class="btn btn-dark btn-sm" id="forwardButton">FOWARD</button>
+		              <button type="button" class="btn btn-dark btn-sm" id="rightButton">RIGHT</button>
+		              <button type="button" class="btn btn-dark btn-sm" id="backwardButton">BACKWARD</button>
+		              <button type="button" class="btn btn-primary btn-sm" id="signButton">SIGN</button>
+	              </div>
+                <div class="btn-group">
+		              <button type="button" class="btn btn-dark btn-sm" id="pauseButton">PAUSE</button>
+		              <button type="button" class="btn btn-dark btn-sm" id="resumeButton">RESUME</button>
+		              <button type="button" class="btn btn-danger btn-sm" id="stopButton">STOP</button>
+	              </div>
               </div>
             </div>
             

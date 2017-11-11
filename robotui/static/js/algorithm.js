@@ -39,15 +39,17 @@ $(document).ready(function(){
       } else if (array[0] == "maze" && array[1] == "start") {
         algorithmMode = MODE_MAZE;
         initAlgorithm();
-        mqttPublish("robot-request", "init");
+        mqttPublish("robot-request", ACTION_CURRENT);
       } else if (array[1] == "stop") {
         algorithmMode = MODE_NONE;
       }  
     } else if (topic == "robot-response") {
-      if (array[0] == "ack" && array[2] != "cannot") {
+      if (array[0] == "ack" && array[2] != "cannot"
+          && (array[1] == ACTION_CURRENT || array[1] == ACTION_FORWARD || array[1] == ACTION_LEFT || array[1] == ACTION_RIGHT || array[1] == ACTION_BACKWARD)) {
         var mm = array.slice(2).join(" ");
         var target = getTargetPosition(algorithmCurX, algorithmCurY);
         
+        console.log(discoveredMap[target.y][target.x]);
         discoveredMap[target.y][target.x] = eraseRobotStr(discoveredMap[target.y][target.x]);
         var result = getNextPosition(algorithmCurX, algorithmCurY, algorithmCurDir, array[1]);
         algorithmCurX = result.x;

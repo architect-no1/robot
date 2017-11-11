@@ -5,22 +5,27 @@ const ERROR = "ERROR";
 const DRAW = "DRAW";
 const EMUL = "EMULATION";
 
-const ACTION_INIT = "init";
+const ACTION_CURRENT= "current";
 const ACTION_FORWARD = "forward";
 const ACTION_LEFT = "left";
 const ACTION_RIGHT = "right";
-const ACTION_UTURN = "uturn";
+const ACTION_BACKWARD = "backward";
+const ACTION_SIGN = "sign";
+const ACTION_PAUSE = "pause";
+const ACTION_RESUME = "resume";
+const ACTION_STOP = "resume";
+
 const ACTION_MAZE_END = "maze end";
 const ACTION_MAP_END = "map end";
 
 // Global Configuration
 var emulationMode = false;
-var emulationDelay = 10;
+var emulationDelay = 1000;
 var algorithmMode = true;
 
 $(document).ready(function(){
   
-  $("#ipInput").val("192.168.56.101");
+  $("#ipInput").val("172.20.1.43");
   
   var mqttClient = null;
   
@@ -36,7 +41,7 @@ $(document).ready(function(){
     var ip = $("#ipInput").val();
     var options = {
       reconnectPeriod : 0,
-      keepalive : 60
+      keepalive : 10
     };
     
     if (ip == "") {
@@ -53,7 +58,8 @@ $(document).ready(function(){
   });
 
   $("#manualButton").click(function() {
-
+    mqttPublish("algorithm-request", "map start");
+    drawInitMap();  
   });
 
   $("#emul_2x2").click(function() {
@@ -71,7 +77,7 @@ $(document).ready(function(){
   });
 
   $("#emul_6x4").click(function() {
-    startEmulation(6, 4, "map");
+    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o x x x o x x x o o o x x o x o x o o o x js1 o o x x o x o x o x o x x x o x x o o o o o x o o o x o x x o x x x o x x x o x o x x o o e x o o s x o o rw x x x x x x x x x x x x x x");
   });
 
   $("#emul_6x4_empty").click(function() {
@@ -83,28 +89,40 @@ $(document).ready(function(){
   });
   
   // Move Button Handler
-  $("#initButton").click(function() {
-    mqttPublish("robot-request", "init");
+  $("#currentButton").click(function() {
+    mqttPublish("robot-request", ACTION_CURRENT);
   });
   
   $("#forwardButton").click(function() {
-    mqttPublish("robot-request", "forward");
+    mqttPublish("robot-request", ACTION_FORWARD);
   });
 
   $("#leftButton").click(function() {
-    mqttPublish("robot-request", "left");
+    mqttPublish("robot-request", ACTION_LEFT);
   });
 
   $("#rightButton").click(function() {
-    mqttPublish("robot-request", "right");
+    mqttPublish("robot-request", ACTION_RIGHT);
   });
 
-  $("#uturnButton").click(function() {
-    mqttPublish("robot-request", "uturn");
+  $("#backwardButton").click(function() {
+    mqttPublish("robot-request", ACTION_BACKWARD);
+  });
+
+  $("#signButton").click(function() {
+    mqttPublish("robot-request", ACTION_SIGN);
+  });
+
+  $("#pauseButton").click(function() {
+    mqttPublish("robot-request", ACTION_PAUSE);
+  });
+
+  $("#resumeButton").click(function() {
+    mqttPublish("robot-request", ACTION_RESUME);
   });
 
   $("#stopButton").click(function() {
-    mqttPublish("robot-request", "stop");
+    mqttPublish("robot-request", ACTION_STOP);
   });
     
   // Log Clear
@@ -136,6 +154,7 @@ $(document).ready(function(){
     
       if (topic == "algorithm-response") {
         var array = message.split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } ); 
+        console.log(array);
         if (array[0] == "map") {
           drawMap(array[1], array[2], array.slice(3).join(" "));
         }  
@@ -161,6 +180,8 @@ $(document).ready(function(){
       mqttClient.subscribe("algorithm-response");
       mqttClient.subscribe("robot-request");
       mqttClient.subscribe("robot-response");
+
+      mqttPublish("algorithm-request", "map start");
     });
 
     mqttClient.on('close', function () {
@@ -168,6 +189,8 @@ $(document).ready(function(){
       $("#ipInput").attr("disabled", false);
       console.log(mqttClient);
       appendLog(ERROR, "Connection closed");
+      $('#disconnectModal').modal('show');
+      $('#disconnectModal').focus();
     });
   };
   
@@ -201,7 +224,7 @@ $(document).ready(function(){
   };  
   
   disableMoveButtons = function(disabled) {
-    $("#initButton").attr("disabled", disabled);
+    $("#currentButton").attr("disabled", disabled);
     $("#leftButton").attr("disabled", disabled);
     $("#forwardButton").attr("disabled", disabled);
     $("#rightButton").attr("disabled", disabled);

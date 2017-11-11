@@ -61,7 +61,7 @@ $(document).ready(function() {
         case 'a':  ty = 1;   td = 's';  break;
         case 'd':  ty = -1;  td = 'w';  break;
       }  
-    } else if (action == ACTION_UTURN) {   
+    } else if (action == ACTION_BACKWARD) {   
       switch (dir) {
         case 'w':  ty = 1;   td = 's';  break;
         case 's':  ty = -1;  td = 'w';  break;
@@ -151,8 +151,8 @@ $(document).ready(function() {
   };
     
   findRobot = function(map, erase = false) {
-    var width = (map.length - 1) / 2;
-    var height = (map[0].length - 1) / 2;
+    var height = (map.length - 1) / 2;
+    var width = (map[0].length - 1) / 2;
     
     for (var i = 0; i < height; i++) {
       for (var j = 0; j < width; j++) {

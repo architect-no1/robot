@@ -12,6 +12,7 @@ $(document).ready(function(){
     appendLog(EMUL, "Start emulation " + width + "x" + height, false);
 
     emulationMap = strToMap(width, height, map);
+    console.log(emulationMap);
     emulationMapWidth = width;
     emulationMapHeight = height;
 
@@ -40,7 +41,7 @@ $(document).ready(function(){
   doEmulation = function(message) {
     message = message.trim();
     
-    if (message != ACTION_INIT && message != ACTION_FORWARD && message != ACTION_LEFT && message != ACTION_RIGHT && message != ACTION_UTURN) {
+    if (message != ACTION_CURRENT && message != ACTION_FORWARD && message != ACTION_LEFT && message != ACTION_RIGHT && message != ACTION_BACKWARD) {
       appendLog(EMUL, "Invalid command");
       return;
     }   
@@ -51,7 +52,7 @@ $(document).ready(function(){
     if ((message == ACTION_RIGHT && isWallStr(r.right)) 
         || (message == ACTION_LEFT && isWallStr(r.left))
         || (message == ACTION_FORWARD && isWallStr(r.forward))
-        || (message == ACTION_UTURN && isWallStr(r.backward))) {
+        || (message == ACTION_BACKWARD && isWallStr(r.backward))) {
       mqttPublish("robot-response", "ack " + message + " cannot");
       return;
     }   
