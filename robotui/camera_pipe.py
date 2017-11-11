@@ -1,11 +1,9 @@
 import time
 from base_camera import BaseCamera
 
+pipeName = "pipe"
 
 class PipeCamera(BaseCamera):
-  def __init__(self, pipeName):
-    self.pipeName = pipeName    
-
   @staticmethod
   def frames():
     while True:
