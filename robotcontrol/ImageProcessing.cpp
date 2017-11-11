@@ -67,7 +67,7 @@ float FindLineInImageAndComputeOffset(cv::Mat& CameraImage)
            double cx;
            cx = r.x + r.width/2;
            //line( CameraImage,Point(cx+10,0),Point(cx+10,CameraImage.rows),Scalar( 0, 255, 0 ),2,8); 
-           if (fabs(cx) > minMaxCx)
+           if (fabs(cx) < minMaxCx)
              {
                minMaxCx = fabs(cx);
                selected_edge=show;
