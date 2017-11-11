@@ -25,10 +25,25 @@ static bool haveStdin() {
 
 class EventHandler : public yolo::Robot::Listener {
 private:
-  yolo::Robot *r;
+  yolo::Robot r;
+
+  TUdpLocalPort *UdpLocalPort;
+  TUdpDest *UdpDest;
 
 public:
-  EventHandler(yolo::Robot *robot) : r(robot) { }
+  EventHandler(const char *ip, const char *port) {
+    r.setListener(this);
+
+    if ((UdpLocalPort = OpenUdpPort(0)) == NULL) {
+      printf("OpenUdpPort Failed\n");
+      exit(0);
+    }
+
+    if ((UdpDest = GetUdpDest(ip, port)) == NULL) {
+      printf("GetUdpDest Failed\n");
+      exit(0);
+    }
+  }
 
   std::string wallsToMapString(bool isRedDot, bool isStart, bool isEnd) {
     char rp = 'o';
@@ -37,10 +52,10 @@ public:
     else if (isEnd) rp = 'e';
 
     std::string ret;
-    ret = r->isWallFront() ? ". x . " : ". o . ";
-    ret += r->isWallLeft() ? "x "     : "o ";
+    ret = r.isWallFront() ? ". x . " : ". o . ";
+    ret += r.isWallLeft() ? "x "     : "o ";
     ret += rp;
-    ret += r->isWallRight()?    " x " :    " o ";
+    ret += r.isWallRight()?    " x " :    " o ";
     ret += ". o .";
     return ret;
   }
@@ -84,107 +99,88 @@ public:
     }
   }
 
+  void processCommand(std::string cmd) {
+    if (cmd.find("hello") != std::string::npos) {
+      r.hello();
+      printf("ack hello\n");
+      fflush(stdout);
+    } else if (cmd.find("current") != std::string::npos) {
+      char rp = 'o';
+      if (yolo::findGreen(r.getCamera())) rp = 's';
+      std::string ret;
+      ret = r.isWallFront() ? ". x . " : ". o . ";
+      ret += r.isWallLeft() ? "x "     : "o ";
+      ret += rp;
+      ret += r.isWallRight()?    " x " :    " o ";
+      ret += ". - .";
+      printf("ack %s %s\n", "current", ret.c_str());
+      fflush(stdout);
+    } else if (cmd.find("init") != std::string::npos) {
+      r.init();
+    } else if (cmd.find("forward") != std::string::npos) {
+      if (r.isWallFront()) {
+        printf("ack forward cannot\n");
+        fflush(stdout);
+      } else {
+        r.goForward();
+      }
+    } else if (cmd.find("left") != std::string::npos) {
+      if (r.isWallLeft()) {
+        printf("ack left cannot\n");
+        fflush(stdout);
+      } else {
+        r.goLeft();
+      }
+    } else if (cmd.find("right") != std::string::npos) {
+      if (r.isWallRight()) {
+        printf("ack right cannot\n");
+        fflush(stdout);
+      } else {
+        r.goRight();
+      }
+    } else if (cmd.find("backward") != std::string::npos) {
+      r.goBackward();
+    } else if (cmd.find("sign") != std::string::npos) {
+      r.checkSigns();
+    } else if (cmd.find("pause") != std::string::npos) {
+      r.pause();
+      printf("ack pause\n");
+      fflush(stdout);
+    } else if (cmd.find("resume") != std::string::npos) {
+      r.resume();
+    } else if (cmd.find("stop") != std::string::npos) {
+      r.stop();
+      printf("ack stop\n");
+      fflush(stdout);
+    }
+  }
+
+  void run() {
+    do {
+      if (haveStdin()) {
+        std::string line;
+        std::getline(std::cin, line);
+        processCommand(line);
+      }
+
+      r.runOneLoop();
+      UdpSendImageAsJpeg(UdpLocalPort, UdpDest, r.getCamera());
+
+      // TODO: write sensor update
+    } while (1);
+  }
+
 };
 
 int main(int argc, char *argv[]) {
-  // TODO: move robot inside EventHandler
-  yolo::Robot robot;
-
-  EventHandler e(&robot);
-  robot.setListener(&e);
-
   const char *ip = "172.20.10.2", *port = "3000";
   if (3 <= argc) {
     ip = argv[1];
     port = argv[2];
   }
 
-  TUdpLocalPort *UdpLocalPort;
-  TUdpDest *UdpDest;
-
-  if ((UdpLocalPort = OpenUdpPort(0)) == NULL) {
-    printf("OpenUdpPort Failed\n");
-    return 0;
-  }
-
-  if ((UdpDest = GetUdpDest(ip, port)) == NULL) {
-    printf("GetUdpDest Failed\n");
-    return 0;
-  }
-
-  // TODO: move this loop to EventHandler
-  do {
-    std::string line;
-    if (haveStdin()) std::getline(std::cin, line);
-    if (line.find("q") != std::string::npos) {
-      break;
-    } else if (line.find("hello") != std::string::npos) {
-      robot.hello();
-      printf("ack hello\n");
-      fflush(stdout);
-    } else if (line.find("current") != std::string::npos) {
-      char rp = 'o';
-      if (yolo::findGreen(robot.getCamera())) rp = 's';
-      std::string ret;
-      ret = robot.isWallFront() ? ". x . " : ". o . ";
-      ret += robot.isWallLeft() ? "x "     : "o ";
-      ret += rp;
-      ret += robot.isWallRight()?    " x " :    " o ";
-      ret += ". - .";
-      printf("ack %s %s\n", "current", ret.c_str());
-      fflush(stdout);
-    } else if (line.find("init") != std::string::npos) {
-      robot.init();
-    } else if (line.find("forward") != std::string::npos) {
-      if (robot.isWallFront()) {
-        printf("ack forward cannot\n");
-        fflush(stdout);
-      } else {
-        robot.goForward();
-      }
-    } else if (line.find("left") != std::string::npos) {
-      if (robot.isWallLeft()) {
-        printf("ack left cannot\n");
-        fflush(stdout);
-      } else {
-        robot.goLeft();
-      }
-    } else if (line.find("right") != std::string::npos) {
-      if (robot.isWallRight()) {
-        printf("ack right cannot\n");
-        fflush(stdout);
-      } else {
-        robot.goRight();
-      }
-    } else if (line.find("backward") != std::string::npos) {
-      robot.goBackward();
-    } else if (line.find("sign") != std::string::npos) {
-      robot.checkSigns();
-    } else if (line.find("pause") != std::string::npos) {
-      robot.pause();
-      printf("ack pause\n");
-      fflush(stdout);
-    } else if (line.find("resume") != std::string::npos) {
-      robot.resume();
-    } else if (line.find("stop") != std::string::npos) {
-      robot.stop();
-      printf("ack stop\n");
-      fflush(stdout);
-    } else if (line == "i") {
-      robot.c.moveUp();
-    } else if (line == "m") {
-      robot.c.moveDown();
-    } else if (line == "j") {
-      robot.c.moveLeft();
-    } else if (line == "l") {
-      robot.c.moveRight();
-    }
-
-    robot.runOneLoop();
-    UdpSendImageAsJpeg(UdpLocalPort, UdpDest, robot.getCamera());
-
-    // TODO: write sensor update
-  } while (1);
+  EventHandler e(ip, port);;
+  e.run();
 
   return 0;
 }
