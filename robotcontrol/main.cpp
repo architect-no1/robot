@@ -30,35 +30,42 @@ private:
 public:
   EventHandler(yolo::Robot *robot) : r(robot) { }
 
-  std::string wallsToMapString(bool isRedDot = false) {
+  std::string wallsToMapString(bool isRedDot, bool isStart, bool isEnd) {
+    char rp = 'o';
+    if (isRedDot) rp = 'j';
+    else if (isStart) rp = 's';
+    else if (isEnd) rp = 'e';
+
     std::string ret;
     ret = r->isWallFront() ? ". x . " : ". o . ";
     ret += r->isWallLeft() ? "x "     : "o ";
-    ret += isRedDot ?          "j "   :   "o ";
-    ret += r->isWallRight()?     "x " :     "o ";
+    ret += rp;
+    ret += r->isWallRight()?    " x " :    " o ";
     ret += ". o .";
     return ret;
   }
 
-  void onMoveComplete(const char *move, bool isRedDot = false) {
-    printf("ack %s %s\n", move, wallsToMapString(isRedDot).c_str());
+  void onMoveComplete(const char *move,
+                      bool isRedDot, bool isStart, bool isEnd) {
+    printf("ack %s %s\n",
+           move, wallsToMapString(isRedDot, isStart, isEnd).c_str());
     fflush(stdout);
   }
 
-  virtual void onForwardComplete(bool isRedDot) {
-    onMoveComplete("forward", isRedDot);
+  virtual void onForwardComplete(bool isRedDot, bool isStart, bool isEnd) {
+    onMoveComplete("forward", isRedDot, isStart, isEnd);
   }
 
-  virtual void onLeftComplete() {
-    onMoveComplete("left");
+  virtual void onLeftComplete(bool isRedDot, bool isStart, bool isEnd) {
+    onMoveComplete("left", isRedDot, isStart, isEnd);
   }
 
-  virtual void onRightComplete() {
-    onMoveComplete("right");
+  virtual void onRightComplete(bool isRedDot, bool isStart, bool isEnd) {
+    onMoveComplete("right", isRedDot, isStart, isEnd);
   }
 
   virtual void onBackwardComplete() {
-    onMoveComplete("backward");
+    onMoveComplete("backward", false, false, false);
   }
 
   virtual void onCheckSignComplete(std::string forward,
@@ -116,10 +123,13 @@ int main(int argc, char *argv[]) {
       printf("ack hello\n");
       fflush(stdout);
     } else if (line.find("current") != std::string::npos) {
+      char rp = 'o';
+      if (yolo::findGreen(robot.getCamera())) rp = 's';
       std::string ret;
       ret = robot.isWallFront() ? ". x . " : ". o . ";
-      ret += robot.isWallLeft() ? "x o "   : "o o ";
-      ret += robot.isWallRight()?     "x " :     "o ";
+      ret += robot.isWallLeft() ? "x "     : "o ";
+      ret += rp;
+      ret += robot.isWallRight()?    " x " :    " o ";
       ret += ". - .";
       printf("ack %s %s\n", "current", ret.c_str());
       fflush(stdout);

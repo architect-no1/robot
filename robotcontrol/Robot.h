@@ -15,6 +15,8 @@ using namespace std;
 
 namespace yolo {
 
+bool findGreen(cv::Mat &camera);
+
 // TODO: singleton?
 class Robot {
 public:
@@ -43,9 +45,9 @@ public:
 
   void runOneLoop();
 
-  void forwardComplete(bool isRedDot);
-  void leftComplete();
-  void rightComplete();
+  void forwardComplete(bool isRedDot, bool isStart, bool isEnd);
+  void leftComplete(bool isRedDot, bool isStart, bool isEnd);
+  void rightComplete(bool isRedDot, bool isStart, bool isEnd);
   void backwardComplete();
 
   void checkSignComplete(std::string forward,
@@ -54,9 +56,9 @@ public:
 
   class Listener {
   public:
-    virtual void onForwardComplete(bool isRedDot) = 0;
-    virtual void onLeftComplete() = 0;
-    virtual void onRightComplete() = 0;
+    virtual void onForwardComplete(bool isRedDot, bool isStart, bool isEnd) = 0;
+    virtual void onLeftComplete(bool isRedDot, bool isStart, bool isEnd) = 0;
+    virtual void onRightComplete(bool isRedDot, bool isStart, bool isEnd) = 0;
     virtual void onBackwardComplete() = 0;
 
     virtual void onCheckSignComplete(std::string forward,
