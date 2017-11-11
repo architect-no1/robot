@@ -166,6 +166,10 @@ int main(int argc, char *argv[]) {
       fflush(stdout);
     } else if (line.find("resume") != std::string::npos) {
       robot.resume();
+    } else if (line.find("stop") != std::string::npos) {
+      robot.stop();
+      printf("ack stop\n");
+      fflush(stdout);
     } else if (line == "i") {
       robot.c.moveUp();
     } else if (line == "m") {
