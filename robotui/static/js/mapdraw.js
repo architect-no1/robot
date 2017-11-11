@@ -2,8 +2,6 @@ $(document).ready(function(){
 
   drawMap = function(mapWidth, mapHeight, mapString, id="mapCanvas", smallMode = false) {
     
-    console.log(DRAW, mapWidth, mapHeight, mapString);
-
     // initialize variables
     var canvas = document.getElementById(id);
     var context = canvas.getContext('2d');
