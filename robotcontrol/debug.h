@@ -22,7 +22,7 @@ static void timediff() {
     diff.tv_nsec += 1000000000;
     diff.tv_sec--;
   }
-  printf("time %d.%09d\n", diff.tv_sec, diff.tv_nsec);
+  fprintf(stderr, "time %d.%09d\n", diff.tv_sec, diff.tv_nsec);
 }
 
 #endif // YOLO_DEBUG_H_

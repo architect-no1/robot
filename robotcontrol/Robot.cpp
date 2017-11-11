@@ -13,11 +13,6 @@
 #include "debug.h"
 
 #define log(...) fprintf(stderr, __VA_ARGS__)
-#define ack(_b) \
-  do {\
-    fprintf(stdout, "ack " _b "\n" );\
-    fflush(stdout);\
-  } while (0)\
 
 namespace yolo {
 
@@ -80,7 +75,6 @@ cv::Mat& Robot::getCamera() {
 }
 
 void Robot::hello() {
-  ack("hello");
 }
 
 void Robot::init() {
@@ -96,7 +90,7 @@ void Robot::updateCamera() {
 }
 
 bool Robot::isWallFront() {
-#define WALL_DISTANCE_MAX 10
+#define WALL_DISTANCE_MAX 15
   //return false;
   return sensor.front < WALL_DISTANCE_MAX;
 }
@@ -111,15 +105,13 @@ bool Robot::isWallRight() {
   return sensor.right/10 < WALL_DISTANCE_MAX;
 }
 
-void Robot::suspend() {
+void Robot::pause() {
   setWheelSpeed(0, 0);
   isPaused = true;
-  ack("suspend");
 }
 
 void Robot::resume() {
   isPaused = false;
-  ack("resume");
 }
 
 class Robot::Behavior {
@@ -165,7 +157,7 @@ static bool findRed(cv::Mat &camera) {
   return max != 0.0;
 }
 
-static bool findGreen(cv::Mat &camera) {
+bool findGreen(cv::Mat &camera) {
   cv::Rect RoiRec(10, 2*camera.rows/3, camera.cols-20, camera.rows/12);
   cv::Mat roi(camera, RoiRec);
   cv::Mat hsv;
@@ -220,7 +212,8 @@ void Robot::followLineForward(bool &foundCrossing) {
 class ForwardBehavior : public Robot::Behavior {
 public:
   ForwardBehavior(Robot* r) : Behavior(r),
-      ticks(0), state(BEFORE_CROSSING) {
+      ticks(0), state(BEFORE_CROSSING),
+      isRedDot(false), isStart(false), isEnd(false) {
     //FIXME: may cause problem on how command is queued. create init state?
     r->followLineForwardInit();
 
@@ -236,10 +229,10 @@ public:
     ticks++;
     switch (state) {
       case BEFORE_CROSSING: {
-        bool foundRed = findRed(r->getCamera());
+        isRedDot |= findRed(r->getCamera());
         bool foundCrossing = false;
         r->followLineForward(foundCrossing);
-        if (foundRed || foundCrossing) {
+        if (isRedDot || foundCrossing) {
           state = AFTER_CROSSING;
           ticks = 0;
         }
@@ -250,9 +243,12 @@ public:
       }
       break;
       case AFTER_CROSSING:
+        isRedDot |= findRed(r->getCamera());
+        isStart |= findGreen(r->getCamera());
+        isEnd |= findBlue(r->getCamera());
         r->followLineForward();
         if (TICKS_AFTER_CROSSING <= ticks) {
-          r->forwardComplete();
+          r->forwardComplete(isRedDot, isStart, isEnd);
         }
       break;
       default:
@@ -267,6 +263,9 @@ private:
     BEFORE_CROSSING,
     AFTER_CROSSING,
   } state;
+  bool isRedDot;
+  bool isStart;
+  bool isEnd;
 };
 
 // NOTE: goForwardInternal?
@@ -277,22 +276,22 @@ void Robot::goForward() {
   behavior = std::make_shared<ForwardBehavior>(this);
 }
 
-void Robot::forwardComplete() {
-  if (listener) listener->onForwardComplete();
+void Robot::forwardComplete(bool isRedDot, bool isStart, bool isEnd) {
+  if (listener) listener->onForwardComplete(isRedDot, isStart, isEnd);
   stop();
 }
 
 class TurnBehavior : public Robot::Behavior {
 public:
   TurnBehavior(Robot* r, bool _isLeft) : Behavior(r),
-      ticks(0), state(TURN), isLeft(_isLeft) {
+      ticks(0), state(TURN), isLeft(_isLeft),
+      isRedDot(false), isStart(false), isEnd(false) {
     r->followLineForwardInit();
   }
 
   ~TurnBehavior() {
-    if (isLeft) ack("left");
-    else ack("right");
   }
+
   virtual void tick() {
     ticks++;
     switch (state) {
@@ -307,10 +306,10 @@ public:
         }
         break;
       case BEFORE_CROSSING: {
-        bool foundRed = findRed(r->getCamera());
+        isRedDot |= findRed(r->getCamera());
         bool foundCrossing = false;
         r->followLineForward(foundCrossing);
-        if (foundRed || foundCrossing) {
+        if (isRedDot || foundCrossing) {
           state = AFTER_CROSSING;
           ticks = 0;
         }
@@ -321,10 +320,13 @@ public:
       }
         break;
       case AFTER_CROSSING:
+        isRedDot |= findRed(r->getCamera());
+        isStart |= findGreen(r->getCamera());
+        isEnd |= findBlue(r->getCamera());
         r->followLineForward();
         if (TICKS_AFTER_CROSSING <= ticks) {
-          if (isLeft) r->leftComplete();
-          else r->rightComplete();
+          if (isLeft) r->leftComplete(isRedDot, isStart, isEnd);
+          else r->rightComplete(isRedDot, isStart, isEnd);
         }
         break;
       default:
@@ -341,6 +343,9 @@ private:
     AFTER_CROSSING,
   } state;
   bool isLeft;
+  bool isRedDot;
+  bool isStart;
+  bool isEnd;
 };
 
 void Robot::goLeft() {
@@ -348,8 +353,8 @@ void Robot::goLeft() {
   behavior = std::make_shared<TurnBehavior>(this, true);
 }
 
-void Robot::leftComplete() {
-  if (listener) listener->onLeftComplete();
+void Robot::leftComplete(bool isRedDot, bool isStart, bool isEnd) {
+  if (listener) listener->onLeftComplete(isRedDot, isStart, isEnd);
   stop();
 }
 
@@ -358,8 +363,8 @@ void Robot::goRight() {
   behavior = std::make_shared<TurnBehavior>(this, false);
 }
 
-void Robot::rightComplete() {
-  if (listener) listener->onRightComplete();
+void Robot::rightComplete(bool isRedDot, bool isStart, bool isEnd) {
+  if (listener) listener->onRightComplete(isRedDot, isStart, isEnd);
   stop();
 }
 
@@ -418,11 +423,6 @@ public:
     r->followLineForwardInit();
   }
   ~CheckSignBehavior() {
-    printf("%s, %s, %s\n",
-        signForward.c_str(),
-        signLeft.c_str(),
-        signRight.c_str());
-    ack("check");
   }
 
   virtual void tick() {

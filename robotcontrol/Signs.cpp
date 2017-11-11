@@ -3,7 +3,7 @@
 #if  defined(_WIN32) || defined(_WIN64)
 #define IMAGE_DIR "signs\\"
 #else
-#define IMAGE_DIR "../../TestOpenCvSigns/signs/"
+#define IMAGE_DIR "./signs/"
 #endif
 
 
@@ -319,11 +319,9 @@ std::string getSign(cv::Mat& camera) {
           putText(camera, symbols[match].name, Point(320, 30), 1,
             2, Scalar(0, 255, 0), 2);
             */
-          printf("Match %s\n", symbols[match].name.c_str());
+          // TODO: return name with highest match
 					return symbols[match].name;
 					//return symbols[match].name.c_str();
-        } else {
-					printf("No Match!\n");
 				}
       }
     }

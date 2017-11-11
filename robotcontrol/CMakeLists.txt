@@ -2,34 +2,32 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 
 PROJECT(yolo)
 
-SET(DEMOPATH ..)
-
 ADD_DEFINITIONS(-std=c++11)
 SET(SENSOR_SOURCES Sensor.cpp
-  ${DEMOPATH}/HC-SR04/Sonar.cpp
+  demo/HC-SR04/Sonar.cpp
 )
 SET(SENSOR_LIBS wiringPi vl53l0x pthread)
 
 INCLUDE_DIRECTORIES(
-  ${DEMOPATH}/VL53L0X_TCA9548A_rasp-master/
-	${DEMOPATH}/VL53L0X_TCA9548A_rasp-master/Api/core/inc
-	${DEMOPATH}/VL53L0X_TCA9548A_rasp-master/platform/inc
-  ${DEMOPATH}/HC-SR04
+  demo/VL53L0X_TCA9548A_rasp-master/
+	demo/VL53L0X_TCA9548A_rasp-master/Api/core/inc
+	demo/VL53L0X_TCA9548A_rasp-master/platform/inc
+  demo/HC-SR04
 )
 
 ADD_LIBRARY(sensor ${SENSOR_SOURCES})
 TARGET_LINK_LIBRARIES(sensor ${SENSOR_LIBS})
 
 SET(ROBOT_SOURCES Robot.cpp ImageProcessing.cpp PID.cpp Signs.cpp Camera.cpp
-  ${DEMOPATH}/Common/Servos.cpp
-	${DEMOPATH}/Common/NetworkUDP.cpp
-	${DEMOPATH}/Common/UdpSendRecvJpeg.cpp
+  demo/Common/Servos.cpp
+  demo/Common/NetworkUDP.cpp
+  demo/Common/UdpSendRecvJpeg.cpp
 )
 SET(ROBOT_LIBS sensor)
 
 #move to Camera
 INCLUDE_DIRECTORIES(
-  ${DEMOPATH}/Common/
+  demo/Common/
 	/home/pi/git/robidouille/raspicam_cv
 )
 LINK_DIRECTORIES(
@@ -51,3 +49,9 @@ SET(SOURCES main.cpp)
 
 ADD_EXECUTABLE(main ${SOURCES})
 TARGET_LINK_LIBRARIES(main robot)
+
+SET(CMAKE_INSTALL_PREFIX /home/pi/robot)
+
+INSTALL(TARGETS main DESTINATION bin)
+INSTALL(PROGRAMS connect.sh DESTINATION bin)
+INSTALL(DIRECTORY signs DESTINATION bin)

@@ -30,43 +30,54 @@ private:
 public:
   EventHandler(yolo::Robot *robot) : r(robot) { }
 
-  std::string wallsToMapString() {
+  std::string wallsToMapString(bool isRedDot, bool isStart, bool isEnd) {
+    char rp = 'o';
+    if (isRedDot) rp = 'j';
+    else if (isStart) rp = 's';
+    else if (isEnd) rp = 'e';
+
     std::string ret;
-    ret = r->isWallFront() ? ". X . " : ". O . ";
-    ret += r->isWallLeft() ? "X O "   : "O O ";
-    ret += r->isWallRight()?     "X " :     "O ";
-    ret += ". . .";
+    ret = r->isWallFront() ? ". x . " : ". o . ";
+    ret += r->isWallLeft() ? "x "     : "o ";
+    ret += rp;
+    ret += r->isWallRight()?    " x " :    " o ";
+    ret += ". o .";
     return ret;
   }
 
-  void onMoveComplete(const char *move) {
-    printf("ack %s %s\n", move, wallsToMapString().c_str());
-    fflush(stdin);
+  void onMoveComplete(const char *move,
+                      bool isRedDot, bool isStart, bool isEnd) {
+    printf("ack %s %s\n",
+           move, wallsToMapString(isRedDot, isStart, isEnd).c_str());
+    fflush(stdout);
   }
 
-  virtual void onForwardComplete() {
-    onMoveComplete("forward");
+  virtual void onForwardComplete(bool isRedDot, bool isStart, bool isEnd) {
+    onMoveComplete("forward", isRedDot, isStart, isEnd);
   }
 
-  virtual void onLeftComplete() {
-    onMoveComplete("left");
+  virtual void onLeftComplete(bool isRedDot, bool isStart, bool isEnd) {
+    onMoveComplete("left", isRedDot, isStart, isEnd);
   }
 
-  virtual void onRightComplete() {
-    onMoveComplete("right");
+  virtual void onRightComplete(bool isRedDot, bool isStart, bool isEnd) {
+    onMoveComplete("right", isRedDot, isStart, isEnd);
   }
 
   virtual void onBackwardComplete() {
-    onMoveComplete("backward");
+    onMoveComplete("backward", false, false, false);
   }
 
   virtual void onCheckSignComplete(std::string forward,
                                    std::string left,
                                    std::string right) {
     std::string signmap = "";
-    if (0 < forward.length()) signmap += "dw" + forward + " ";
-    if (0 < left.length()) signmap += "da" + left + " ";
-    if (0 < right.length()) signmap += "dd" + right + " ";
+    if (0 < forward.length()) signmap += "w" + forward;
+    else if (0 < left.length()) signmap += "a" + left;
+    else if (0 < right.length()) signmap += "d" + right;
+
+    printf("ack sign %s\n", signmap.c_str());
+    fflush(stdout);
 
     if (0 == signmap.length()) {
       // TODO: error
@@ -109,22 +120,56 @@ int main(int argc, char *argv[]) {
       break;
     } else if (line.find("hello") != std::string::npos) {
       robot.hello();
+      printf("ack hello\n");
+      fflush(stdout);
+    } else if (line.find("current") != std::string::npos) {
+      char rp = 'o';
+      if (yolo::findGreen(robot.getCamera())) rp = 's';
+      std::string ret;
+      ret = robot.isWallFront() ? ". x . " : ". o . ";
+      ret += robot.isWallLeft() ? "x "     : "o ";
+      ret += rp;
+      ret += robot.isWallRight()?    " x " :    " o ";
+      ret += ". - .";
+      printf("ack %s %s\n", "current", ret.c_str());
+      fflush(stdout);
     } else if (line.find("init") != std::string::npos) {
       robot.init();
     } else if (line.find("forward") != std::string::npos) {
-      robot.goForward();
+      if (robot.isWallFront()) {
+        printf("ack forward cannot\n");
+        fflush(stdout);
+      } else {
+        robot.goForward();
+      }
     } else if (line.find("left") != std::string::npos) {
-      robot.goLeft();
+      if (robot.isWallLeft()) {
+        printf("ack left cannot\n");
+        fflush(stdout);
+      } else {
+        robot.goLeft();
+      }
     } else if (line.find("right") != std::string::npos) {
-      robot.goRight();
+      if (robot.isWallRight()) {
+        printf("ack right cannot\n");
+        fflush(stdout);
+      } else {
+        robot.goRight();
+      }
     } else if (line.find("backward") != std::string::npos) {
       robot.goBackward();
-    } else if (line.find("check") != std::string::npos) {
+    } else if (line.find("sign") != std::string::npos) {
       robot.checkSigns();
-    } else if (line.find("suspend") != std::string::npos) {
-      robot.suspend();
+    } else if (line.find("pause") != std::string::npos) {
+      robot.pause();
+      printf("ack pause\n");
+      fflush(stdout);
     } else if (line.find("resume") != std::string::npos) {
       robot.resume();
+    } else if (line.find("stop") != std::string::npos) {
+      robot.stop();
+      printf("ack stop\n");
+      fflush(stdout);
     } else if (line == "i") {
       robot.c.moveUp();
     } else if (line == "m") {
