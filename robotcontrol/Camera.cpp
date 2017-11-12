@@ -34,25 +34,25 @@ int Camera::setTilt(int t) {
 void Camera::moveLeft() {
   pan += 3;
   SetServoPosition(CAMERA_PAN, pan);
-  printf("pan %d tilt %d\n", pan, tilt);
+  fprintf(stderr, "pan %d tilt %d\n", pan, tilt);
 }
 
 void Camera::moveRight() {
   pan -= 3;
   SetServoPosition(CAMERA_PAN, pan);
-  printf("pan %d tilt %d\n", pan, tilt);
+  fprintf(stderr, "pan %d tilt %d\n", pan, tilt);
 }
 
 void Camera::moveUp() {
   tilt -= 3;
   SetServoPosition(CAMERA_TILT, tilt);
-  printf("pan %d tilt %d\n", pan, tilt);
+  fprintf(stderr, "pan %d tilt %d\n", pan, tilt);
 }
 
 void Camera::moveDown() {
   tilt += 3;
   SetServoPosition(CAMERA_TILT, tilt);
-  printf("pan %d tilt %d\n", pan, tilt);
+  fprintf(stderr, "pan %d tilt %d\n", pan, tilt);
 }
 
 } // namespace yolo
