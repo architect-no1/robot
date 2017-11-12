@@ -13,14 +13,19 @@ const ACTION_BACKWARD = "backward";
 const ACTION_SIGN = "sign";
 const ACTION_PAUSE = "pause";
 const ACTION_RESUME = "resume";
-const ACTION_STOP = "resume";
+const ACTION_STOP = "stop";
+
+const ACTION_SERVOUP = "servoup";
+const ACTION_SERVODOWN = "servodown";
+const ACTION_SERVOLEFT = "servoleft";
+const ACTION_SERVORIGHT = "servoright";
 
 const ACTION_MAZE_END = "maze end";
 const ACTION_MAP_END = "map end";
 
 // Global Configuration
 var emulationMode = false;
-var emulationDelay = 1000;
+var emulationDelay = 10;
 var algorithmMode = true;
 
 $(document).ready(function(){
@@ -124,6 +129,32 @@ $(document).ready(function(){
   $("#stopButton").click(function() {
     mqttPublish("robot-request", ACTION_STOP);
   });
+
+  $("#servoupButton").click(function() {
+    mqttPublish("robot-request", ACTION_SERVOUP);
+  });
+    
+  $("#servodownButton").click(function() {
+    mqttPublish("robot-request", ACTION_SERVODOWN);
+  });
+    
+  $("#servoleftButton").click(function() {
+    mqttPublish("robot-request", ACTION_SERVOLEFT);
+  });
+    
+  $("#servorightButton").click(function() {
+    mqttPublish("robot-request", ACTION_SERVORIGHT);
+  });
+
+  $("#algorithm_ui").click(function() {
+    $("#algorithmButton").text('UI\'s Algorithm');
+    algorithmMode = true;
+  });
+
+  $("#algorithm_robot").click(function() {
+    $("#algorithmButton").text('Robot\'s Algorithm');
+    algorithmMode = false;
+  });
     
   // Log Clear
   $("#logClearButton").click(function() {
@@ -154,8 +185,8 @@ $(document).ready(function(){
     
       if (topic == "algorithm-response") {
         var array = message.split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } ); 
-        console.log(array);
         if (array[0] == "map") {
+          verifyMap(array[1], array[2], array.slice(3).join(" "));
           drawMap(array[1], array[2], array.slice(3).join(" "));
         }  
       }  

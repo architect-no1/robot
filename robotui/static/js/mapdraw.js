@@ -206,14 +206,9 @@ $(document).ready(function(){
     };  
     
     // draw map
-    var MA = [];
-    var mapRawArray = mapString.split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );  
-    var arrayWidth = mapWidth * 2 + 1;
-    var arrayHeight = mapHeight * 2 + 1;
     var signBlockArray = [];
-    for (var i = 0; i < arrayHeight; i++) {
-      MA[i] = mapRawArray.slice(i * arrayWidth, (i + 1) * arrayWidth); 
-    }
+    MA = strToMap(mapWidth, mapHeight, mapString);
+
     for (var i = 0; i < mapHeight; i++) {
       for (var j = 0; j < mapWidth; j++) {
         var x = j * 2 + 1;
@@ -223,7 +218,7 @@ $(document).ready(function(){
           [MA[y][x-1], MA[y][x], MA[y][x+1]],
           [MA[y+1][x-1], MA[y+1][x], MA[y+1][x+1]],
         ]; 
-        if (MA[y][x].charAt(0) == 'd') {
+        if (MA[y][x].charAt(0) == 'j') {
           signBlockArray.push([j, i, data]);
         } else {  
           drawBlock(j, i, mapWidth, mapHeight, data);

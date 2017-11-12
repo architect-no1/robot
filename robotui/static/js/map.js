@@ -4,6 +4,11 @@ $(document).ready(function() {
     var mapRawArray = mapStr.split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );  
     var arrayWidth = width * 2 + 1;
     var arrayHeight = height * 2 + 1;
+    
+    if (mapRawArray.length != arrayWidth * arrayHeight) {
+      appendLog(ERROR, "map data size is invalid. " + (width * 2 + 1) + " x " + (height * 2 + 1) + " != " + mapRawArray.length, true);
+    }
+
     var map = [];
     for (var i = 0; i < arrayHeight; i++) {
       map[i] = mapRawArray.slice(i * arrayWidth, (i + 1) * arrayWidth); 
@@ -166,7 +171,7 @@ $(document).ready(function() {
         }  
       }
     }
-    return { x : 0, y : 0, dir : 'w', current : 'o'};
+    return { x : -1, y : -1, dir : 'w', current : 'o'};
   }  
     
   eraseRobotStr = function(str) {
@@ -195,5 +200,9 @@ $(document).ready(function() {
       return true;
     }  
     return false;
-  }  
+  };  
+
+  verifyMap = function(width, height, mm) {
+    // check robot location
+  };
 });  

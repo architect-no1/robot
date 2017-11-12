@@ -16,11 +16,18 @@ if [[ ${1} != "robot" && ${1} != "algorithm" ]]; then
   exit 1
 fi
 
-RTOPIC=${1}-request
-WTOPIC=${1}-response
-
-mosquitto_sub -h ${HOST} -t ${RTOPIC} | ${@:2} | \
-while read line; do
-  mosquitto_pub -h ${HOST} -t ${WTOPIC} -m "${line}"
-done
-
+if [[ ${1} == "robot" ]]; then
+  mosquitto_sub -h ${HOST} -t robot-request | ${@:2} | \
+  while read line; do
+    mosquitto_pub -h ${HOST} -t robot-response -m "${line}"
+  done
+else
+  mosquitto_sub -h ${HOST} -t algorithm-request -t robot-response | ${@:2} | \
+  while read line; do
+    if [[ ${line} == "current" || ${line} == "forward" || ${line} == "backword" || ${line} == "left" || ${line} == "right" || ${line} == "sign" ]]; then
+      mosquitto_pub -h ${HOST} -t robot-request -m "${line}"
+    else
+      mosquitto_pub -h ${HOST} -t algorithm-response -m "${line}"
+    fi
+  done
+fi

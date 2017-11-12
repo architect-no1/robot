@@ -35,10 +35,12 @@ $(document).ready(function(){
       if (array[0] == "map" && array[1] == "start") {
         algorithmMode = MODE_MAP;
         initAlgorithm();
+        mqttPublish("algorithm-response", "ack map start");
         
       } else if (array[0] == "maze" && array[1] == "start") {
         algorithmMode = MODE_MAZE;
         initAlgorithm();
+        mqttPublish("algorithm-response", "ack maze start");
         mqttPublish("robot-request", ACTION_CURRENT);
       } else if (array[1] == "stop") {
         algorithmMode = MODE_NONE;
@@ -49,7 +51,6 @@ $(document).ready(function(){
         var mm = array.slice(2).join(" ");
         var target = getTargetPosition(algorithmCurX, algorithmCurY);
         
-        console.log(discoveredMap[target.y][target.x]);
         discoveredMap[target.y][target.x] = eraseRobotStr(discoveredMap[target.y][target.x]);
         var result = getNextPosition(algorithmCurX, algorithmCurY, algorithmCurDir, array[1]);
         algorithmCurX = result.x;
@@ -111,6 +112,7 @@ $(document).ready(function(){
     
     for (var i = 0; i < calHeight; i++) {
       var row = discoveredMap[minY + i].slice(minX, maxX + 1);
+
       resultArray.push(row);
     }  
     mapReplace(resultArray, "?", "-");

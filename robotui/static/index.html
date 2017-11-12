@@ -96,18 +96,29 @@
                   <button type="button" class="btn btn-primary btn-sm" id="manualButton">Manual</button>
                 </div>
                 &nbsp; &nbsp;
-                <button class="btn btn-sm btn-danger dropdown-toggle" type="button" id="emulationButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Emulation
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <a class="dropdown-item" id="emul_2x2">2x2</a>
-                  <a class="dropdown-item" id="emul_2x2_empty">2x2 EMPTY</a>
-                  <a class="dropdown-item" id="emul_4x4">4x4</a>
-                  <a class="dropdown-item" id="emul_6x4">6x4 Project Requirement</a>
-                  <a class="dropdown-item" id="emul_6x4_empty">6x4 EMPTY</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" id="emul_stop">STOP</a>
+                <div class="btn-group">
+	                <button class="btn btn-sm btn-danger dropdown-toggle" type="button" id="emulationButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	                Emulation
+	                </button>
+	                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+	                  <a class="dropdown-item" id="emul_2x2">2x2</a>
+	                  <a class="dropdown-item" id="emul_2x2_empty">2x2 EMPTY</a>
+	                  <a class="dropdown-item" id="emul_4x4">4x4</a>
+	                  <a class="dropdown-item" id="emul_6x4">6x4 Project Requirement</a>
+	                  <a class="dropdown-item" id="emul_6x4_empty">6x4 EMPTY</a>
+	                  <div class="dropdown-divider"></div>
+	                  <a class="dropdown-item" id="emul_stop">STOP</a>
+	                </div>
                 </div>
+                <div class="btn-group">
+	                <button class="btn btn-sm btn-danger dropdown-toggle" type="button" id="algorithmButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	                UI's Algorithm
+	                </button>
+	                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+	                  <a class="dropdown-item" id="algorithm_robot">Robot's Algorithm</a>
+	                  <a class="dropdown-item" id="algorithm_ui">UI's Algorithm</a>
+	                </div>
+                </div> 
               </div>
             </div>
             
@@ -129,29 +140,15 @@
 	              </div>
               </div>
             </div>
-            
-<!--            
             <div class="mt-1">
               <div><span class="badge badge-info">CAMERA</span></div>
-              <div class="input-group">
-                <span class="input-group-btn">
-                  <button class="btn btn-dark btn-sm" type="button">Up</button>
-                </span>
-                <input type="text" class="form-control form-control-sm col-1" aria-label="Amount (to the nearest dollar)">
-                <span class="input-group-btn">
-                  <button class="btn btn-dark btn-sm" type="button">Down</button>
-                </span>
-                &nbsp;&nbsp;&nbsp;
-                <span class="input-group-btn">
-                  <button class="btn btn-dark btn-sm" type="button">Left</button>
-                </span>
-                <input type="text" class="form-control form-control-sm col-1" aria-label="Amount (to the nearest dollar)">
-                <span class="input-group-btn">
-                  <button class="btn btn-dark btn-sm" type="button">Right</button>
-                </span>
+              <div class="btn-group">
+	              <button type="button" class="btn btn-dark btn-sm" id="servoupButton">UP</button>
+	              <button type="button" class="btn btn-dark btn-sm" id="servodownButton">DOWN</button>
+	              <button type="button" class="btn btn-dark btn-sm" id="servoleftButton">LEFT</button>
+	              <button type="button" class="btn btn-dark btn-sm" id="servorightButton">RIGHT</button>
               </div>
             </div>
--->
 <!--            
             <div class="mt-1">
               <div><span class="badge badge-info">SPEED</span></div>

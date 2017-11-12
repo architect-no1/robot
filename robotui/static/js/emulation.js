@@ -12,7 +12,6 @@ $(document).ready(function(){
     appendLog(EMUL, "Start emulation " + width + "x" + height, false);
 
     emulationMap = strToMap(width, height, map);
-    console.log(emulationMap);
     emulationMapWidth = width;
     emulationMapHeight = height;
 
@@ -22,7 +21,10 @@ $(document).ready(function(){
     emulationCurDir = robot.dir;
     emulationMap[robot.y * 2 + 1][robot.x * 2 + 1] = robot.current;
     appendLog(EMUL, "robot=(" + emulationCurX + "," + emulationCurY + "," + emulationCurDir +")");
-    
+
+    $("#cameraImage").attr('width', '0');
+    $("#cameraImage").attr('height', '0');
+    $("#smallMapCanvas").show();
     drawInitMap();
     drawSmallMap(width, height, map);
 
@@ -36,6 +38,10 @@ $(document).ready(function(){
     emulationMapWidth = 0;
     emulationMapHeight = 0;
     appendLog(EMUL, "Stop emulation");
+
+    $("#cameraImage").attr('width', '320');
+    $("#cameraImage").attr('height', '240');
+    $("#smallMapCanvas").hide();
   };
   
   doEmulation = function(message) {
