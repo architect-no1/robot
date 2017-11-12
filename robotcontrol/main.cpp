@@ -104,6 +104,22 @@ public:
       r.hello();
       printf("ack hello\n");
       fflush(stdout);
+    } else if (cmd == "servoup") {
+      r.c.moveUp();
+      printf("ack servoup\n");
+      fflush(stdout);
+    } else if (cmd == "servodown") {
+      r.c.moveDown();
+      printf("ack servodown\n");
+      fflush(stdout);
+    } else if (cmd == "servoleft") {
+      r.c.moveLeft();
+      printf("ack servoleft\n");
+      fflush(stdout);
+    } else if (cmd == "servoright") {
+      r.c.moveRight();
+      printf("ack servoright\n");
+      fflush(stdout);
     } else if (cmd.find("current") != std::string::npos) {
       char rp = 'o';
       if (yolo::findGreen(r.getCamera())) rp = 's';
