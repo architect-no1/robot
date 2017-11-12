@@ -83,6 +83,14 @@ public:
     onMoveComplete("backward", false, false, false);
   }
 
+  void capture(cv::Mat &mat) {
+    static int id = 0;
+    std::string filename = "capture/";
+    filename += id;
+    filename += ".jpg";
+    imwrite(filename.c_str(), mat);
+  }
+
   virtual void onCheckSignComplete(std::string forward,
                                    std::string left,
                                    std::string right) {
@@ -168,6 +176,8 @@ public:
       r.stop();
       printf("ack stop\n");
       fflush(stdout);
+    } else if (cmd.find("capture") != std::string::npos) {
+      capture(r.getCamera());
     }
   }
 
