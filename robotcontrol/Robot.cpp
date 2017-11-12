@@ -380,14 +380,14 @@ public:
     ticks++;
     switch (state) {
       case BACKWARD1:
-        r->setWheelSpeed(-BASESPEED, 0);
+        r->setWheelSpeed(0, -BASESPEED);
         if (TICKS_TURN <= ticks) {
           ticks = 0;
           state = BACKWARD2;
         }
         break;
       case BACKWARD2:
-        r->setWheelSpeed(0, BASESPEED);
+        r->setWheelSpeed(BASESPEED, 0);
         if (TICKS_TURN <= ticks) {
           r->backwardComplete();
         }
