@@ -24,11 +24,12 @@ if [[ ${1} == "robot" ]]; then
 else
   mosquitto_sub -h ${HOST} -t algorithm-request -t robot-response | ${@:2} | \
   while read line; do
-    if [[ ${line} == "current" || ${line} == "forward" || ${line} == "backword" || ${line} == "left" || ${line} == "right" || ${line} == "sign" ]]; then
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}" 
+    if [[ ${line} == "current" || ${line} == "forward" || ${line} == "backward" || ${line} == "left" || ${line} == "right" || ${line} == "sign" ]]; then
       mosquitto_pub -h ${HOST} -t robot-request -m "${line}"
     else
       mosquitto_pub -h ${HOST} -t algorithm-response -m "${line}"
     fi
   done
 fi
-
