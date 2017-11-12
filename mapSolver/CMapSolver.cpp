@@ -45,7 +45,7 @@ std::string CMapSolver::translate_eMovCMd2String(eMovCmd mov)
 		break;
 
     case eMovCmd_UTURN:
-		str = "uturn";
+		str = "backward";
 		break;
 
 	default:
