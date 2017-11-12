@@ -47,11 +47,10 @@ $(document).ready(function(){
   doEmulation = function(message) {
     message = message.trim();
     
-    if (message != ACTION_CURRENT && message != ACTION_FORWARD && message != ACTION_LEFT && message != ACTION_RIGHT && message != ACTION_BACKWARD) {
+    if (message != ACTION_CURRENT && message != ACTION_FORWARD && message != ACTION_LEFT && message != ACTION_RIGHT && message != ACTION_BACKWARD && message != ACTION_SIGN) {
       appendLog(EMUL, "Invalid command");
       return;
     }   
-
 
     // check move possible
     var r = getMap(emulationMap, emulationCurX, emulationCurY, emulationCurDir);
@@ -62,6 +61,11 @@ $(document).ready(function(){
       mqttPublish("robot-response", "ack " + message + " cannot");
       return;
     }   
+
+    if (message == ACTION_SIGN) {
+      mqttPublish("robot-response", "ack sign " + rotatedSignStr(getSignStr(r.current), emulationCurDir));
+      return;
+    }
 
     // check out of map
     var result = getNextPosition(emulationCurX, emulationCurY, emulationCurDir, message);
@@ -86,6 +90,6 @@ $(document).ready(function(){
       
   getEmulation = function(curX, curY, curDir) {
     var result = getMap(emulationMap, curX, curY, curDir);
-    return ". " + result.forward + " . " + result.left + " " + result.current + " " + result.right + " . - .";
+    return ". " + result.forward + " . " + result.left + " " + eraseSignStr(result.current) + " " + result.right + " . - .";
   }  
 });

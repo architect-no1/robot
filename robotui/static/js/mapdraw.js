@@ -1,7 +1,14 @@
 $(document).ready(function(){
+  var lastMapWidth = 1;
+  var lastMapHeight = 1;
+  var lastMapString = "";
 
-  drawMap = function(mapWidth, mapHeight, mapString, id="mapCanvas", smallMode = false) {
-    
+  drawMap = function(mapWidth, mapHeight, mapString, id="mapCanvas", smallMode = false) {    
+    // backup last draw data
+    lastMapWidth = mapWidth;
+    lastMapHeight = mapHeight;
+    lastMapString = mapString;
+
     // initialize variables
     var canvas = document.getElementById(id);
     var context = canvas.getContext('2d');
@@ -26,8 +33,8 @@ $(document).ready(function(){
     var arrowR45Image = document.getElementById("arrowR45Image");
     var arrowImage = document.getElementById("arrowImage");
 
-    var maxMapWidth = 6;
-    var maxMapHeight = 4;
+    var maxMapWidth = Math.max(6, mapWidth);
+    var maxMapHeight = Math.max(4, mapHeight);
     var blockSize = Math.floor(Math.min(canvasWidth / maxMapWidth, canvasHeight / maxMapHeight));
     
     context.fillStyle = "white";
@@ -39,13 +46,13 @@ $(document).ready(function(){
       var startY = marginY + (canvasHeight - blockSize * height) / 2 + y * blockSize;
       
       // draw background
-      if (data[1][1].charAt(data[1][1].length - 1) == 's' || data[1][1].charAt(data[1][1].length - 1) == 'e' || data[1][1].charAt(data[1][1].length - 1) == '-') {
+      if (isStartStr(data[1][1]) || isEndStr(data[1][1]) || isUnknownStr(data[1][1])) {
         context.beginPath();
-        if (data[1][1].charAt(data[1][1].length - 1) == 's') {
+        if (isStartStr(data[1][1])) {
           context.fillStyle = "#00B050";
-        } else if (data[1][1].charAt(data[1][1].length - 1) == 'e') {
+        } else if (isEndStr(data[1][1])) {
           context.fillStyle = "#00B0F0";
-        } else if (data[1][1].charAt(data[1][1].length - 1) == '-') {
+        } else if (isUnknownStr('-')) {
           context.fillStyle = "#DDDDDD";
         }
         context.fillRect(startX, startY, blockSize, blockSize);
@@ -120,9 +127,32 @@ $(document).ready(function(){
         context.lineTo(startX + blockSize, startY + blockSize);
       }
       context.stroke();
+
+      // draw robot
+      var robotStr = getRobotStr(data[1][1]);
+      
+      if (robotStr) {
+        var robotMargin = blockSize / 6;
+        
+        context.save();
+        context.translate(startX + robotMargin, startY + robotMargin);
+        context.translate((blockSize - robotMargin * 2) / 2, (blockSize - robotMargin * 2) / 2);
+        
+        var rad = 0;
+        switch (robotStr.charAt(1)) {
+          case 'w':   rad = 0;  break;
+          case 's':   rad = Math.PI;  break;
+          case 'a':   rad = -Math.PI / 2;  break;
+          case 'd':   rad = Math.PI / 2;  break;
+        }            
+        context.rotate(rad);
+        context.drawImage(robotImage, - (blockSize - robotMargin * 2) / 2, - (blockSize - robotMargin * 2) / 2, 
+                                      blockSize - robotMargin * 2, blockSize - robotMargin * 2);
+        context.restore();
+      }
       
       // draw red dot
-      if (data[1][1].charAt(0) == 'j') {
+      if (isReddotStr(data[1][1])) {
         var radius = blockSize / 9;
         context.beginPath();
         context.arc(startX + blockSize / 2, startY + blockSize / 2, radius, 0, Math.PI * 2, false);
@@ -133,7 +163,8 @@ $(document).ready(function(){
         context.stroke();
 
         // draw sign
-        if (data[1][1].length >= 2 && !smallMode) {
+        signs = getSignStr(data[1][1]);
+        if (signs.length >= 2 && !smallMode) {
           var signWidth = 30;
           var signHeight = 23;
           var signXMargin = (blockSize - signWidth) / 2;           
@@ -142,7 +173,6 @@ $(document).ready(function(){
           context.lineWidth = 3;
           context.strokeStyle = '#73DC80';
           
-          var signs = data[1][1].substring(1)
           for (var i = 0; i < signs.length / 2; i++) {
             var sign = signs.substring(i * 2, (i + 1) * 2);
             var signImage = arrowBImage;
@@ -181,28 +211,6 @@ $(document).ready(function(){
         }              
       }
       
-      // draw robot
-      var robotStr = getRobotStr(data[1][1]);
-      
-      if (robotStr) {
-        var robotMargin = blockSize / 6;
-        
-        context.save();
-        context.translate(startX + robotMargin, startY + robotMargin);
-        context.translate((blockSize - robotMargin * 2) / 2, (blockSize - robotMargin * 2) / 2);
-        
-        var rad = 0;
-        switch (robotStr.charAt(1)) {
-          case 'w':   rad = 0;  break;
-          case 's':   rad = Math.PI;  break;
-          case 'a':   rad = -Math.PI / 2;  break;
-          case 'd':   rad = Math.PI / 2;  break;
-        }            
-        context.rotate(rad);
-        context.drawImage(robotImage, - (blockSize - robotMargin * 2) / 2, - (blockSize - robotMargin * 2) / 2, 
-                                      blockSize - robotMargin * 2, blockSize - robotMargin * 2);
-        context.restore();
-      }
     };  
     
     // draw map
@@ -218,7 +226,7 @@ $(document).ready(function(){
           [MA[y][x-1], MA[y][x], MA[y][x+1]],
           [MA[y+1][x-1], MA[y+1][x], MA[y+1][x+1]],
         ]; 
-        if (MA[y][x].charAt(0) == 'j') {
+        if (isReddotStr(MA[y][x])) {
           signBlockArray.push([j, i, data]);
         } else {  
           drawBlock(j, i, mapWidth, mapHeight, data);
@@ -247,6 +255,10 @@ $(document).ready(function(){
 
   drawSmallMap = function(width, height, map) {
     drawMap(width, height, map, "smallMapCanvas", true);
+  }
+
+  drawLastMap = function(id) {
+    drawMap(lastMapWidth, lastMapHeight, lastMapString, id);    
   }
   
   drawInitMap();

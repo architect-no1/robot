@@ -185,6 +185,15 @@ $(document).ready(function() {
     } 
     return str;  
   };  
+
+  eraseSignStr = function(str) {
+    var index = str.indexOf("j");
+    if (index >= 0) {
+      var result = str.replace(str.substring(index + 1, index + 3), "");
+      return result;
+    } 
+    return str;  
+  };  
   
   getRobotStr = function(str) {
     var index = str.indexOf("r");
@@ -201,6 +210,136 @@ $(document).ready(function() {
     }  
     return false;
   };  
+
+  isReddotStr = function(str) {
+    var index = str.indexOf("j");
+    if (index >= 0) {
+      return true;
+    }  
+    return false;
+  };  
+
+  isStartStr = function(str) {
+    var index = str.indexOf("b");
+    if (index >= 0) {
+      return true;
+    }  
+    return false;
+  };  
+
+  isEndStr = function(str) {
+    var index = str.indexOf("f");
+    if (index >= 0) {
+      return true;
+    }  
+    return false;
+  };  
+
+  isUnknownStr = function(str) {
+    var index = str.indexOf("-");
+    if (index >= 0) {
+      return true;
+    }  
+    return false;
+  };  
+
+  getSignStr = function(str) {
+    var index = str.indexOf("j");
+    if (index >= 0 && str.substring(index+1).length >= 2) {
+      return str.substring(index+1);
+    }  
+    return "";
+  };  
+
+  rotatedSignStr = function(sign, dir) {
+    if (sign.length != 2) {
+      appendLog(ERROR, "sign string is too short or too long : " + sign, true);
+    }
+    signDir = sign.charAt(0);
+    signNum = sign.charAt(1);   
+    targetDir = '';
+
+    switch(dir) {
+      case 'w':
+        switch(signDir) {
+          case 'w':  targetDir = 'w';  break;
+          case 's':  targetDir = 's';  break;
+          case 'a':  targetDir = 'a';  break;
+          case 'd':  targetDir = 'd';  break;
+        }
+        break;
+      case 's':
+        switch(signDir) {
+          case 'w':  targetDir = 's';  break;
+          case 's':  targetDir = 'w';  break;
+          case 'a':  targetDir = 'd';  break;
+          case 'd':  targetDir = 'a';  break;
+        }
+        break;
+      case 'a':
+        switch(signDir) {
+          case 'w':  targetDir = 'd';  break;
+          case 's':  targetDir = 'a';  break;
+          case 'a':  targetDir = 'w';  break;
+          case 'd':  targetDir = 's';  break;
+        }
+        break;
+      case 'd':
+        switch(signDir) {
+          case 'w':  targetDir = 'a';  break;
+          case 's':  targetDir = 'd';  break;
+          case 'a':  targetDir = 's';  break;
+          case 'd':  targetDir = 'w';  break;
+        }
+        break;
+    }
+    return targetDir + signNum;
+  }
+
+  mapSignStr = function(sign, dir) {
+    if (sign.length != 2) {
+      appendLog(ERROR, "sign string is too short or too long : " + sign, true);
+    }
+    signDir = sign.charAt(0);
+    signNum = sign.charAt(1);   
+    targetDir = '';
+
+    switch(dir) {
+      case 'w':
+        switch(signDir) {
+          case 'w':  targetDir = 'w';  break;
+          case 's':  targetDir = 's';  break;
+          case 'a':  targetDir = 'a';  break;
+          case 'd':  targetDir = 'd';  break;
+        }
+        break;
+      case 's':
+        switch(signDir) {
+          case 'w':  targetDir = 's';  break;
+          case 's':  targetDir = 'w';  break;
+          case 'a':  targetDir = 'd';  break;
+          case 'd':  targetDir = 'a';  break;
+        }
+        break;
+      case 'a':
+        switch(signDir) {
+          case 'w':  targetDir = 'a';  break;
+          case 's':  targetDir = 'd';  break;
+          case 'a':  targetDir = 's';  break;
+          case 'd':  targetDir = 'w';  break;
+        }
+        break;
+      case 'd':
+        switch(signDir) {
+          case 'w':  targetDir = 'd';  break;
+          case 's':  targetDir = 'a';  break;
+          case 'a':  targetDir = 'w';  break;
+          case 'd':  targetDir = 's';  break;
+        }
+        break;
+    }
+    return targetDir + signNum;
+  }
 
   verifyMap = function(width, height, mm) {
     // check robot location

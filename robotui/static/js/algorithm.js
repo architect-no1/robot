@@ -4,7 +4,7 @@ $(document).ready(function(){
   const MODE_MAP = 1;
   const MODE_MAZE = 2;
   const maxWidth = 6;
-  const maxHeight = 4;
+  const maxHeight = 6;
   
   var algorithmMode = MODE_NONE;
   var discoveredMap = null;
@@ -69,7 +69,27 @@ $(document).ready(function(){
             mqttPublish("algorithm-response", action);
           }  
         }  
-      }  
+      }
+      if (array[0] == "ack" && array[1] == ACTION_SIGN && array[2] != "cannot") {
+        var sign = array[2];
+        var target = getTargetPosition(algorithmCurX, algorithmCurY);
+        discoveredMap[target.y][target.x] += mapSignStr(sign, algorithmCurDir);
+
+        var map = makeMap(algorithmCurX, algorithmCurY, algorithmCurDir, "");
+        mqttPublish("algorithm-response", map);
+
+        // Auto Mode
+        if (algorithmMode == MODE_MAZE) {
+          setAlgorithmMap(discoveredMap);
+          var action = getAlgorithmNext();
+          if (action != ACTION_MAZE_END && action != ACTION_MAP_END) {
+            mqttPublish("robot-request", action);
+          } else {
+            mqttPublish("algorithm-response", action);
+          }  
+        }  
+      } 
+  
     }
   };
 
@@ -82,12 +102,14 @@ $(document).ready(function(){
   };  
     
   makeMap = function(currentX, currentY, currentDir, mm) {
-    var target = getTargetPosition(currentX, currentY);
     
-    var map = strToMap(1, 1, mm);
-    var result = getMap(map, 0, 0);
-    discoveredMap[target.y][target.x] = "r" + currentDir + result.current;
-    setMap(discoveredMap, target.x, target.y, currentDir, result.forward, result.left, result.right, result.backward, '?');
+    if (mm.length > 0) {
+      var target = getTargetPosition(currentX, currentY);
+	    var map = strToMap(1, 1, mm);
+	    var result = getMap(map, 0, 0);
+	    discoveredMap[target.y][target.x] = "r" + currentDir + result.current;
+	    setMap(discoveredMap, target.x, target.y, currentDir, result.forward, result.left, result.right, result.backward, '?');
+    }
     
     // calculate map size
     var minX = 1000;
