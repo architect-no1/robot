@@ -48,8 +48,8 @@ public:
   std::string wallsToMapString(bool isRedDot, bool isStart, bool isEnd) {
     char rp = 'o';
     if (isRedDot) rp = 'j';
-    else if (isStart) rp = 's';
-    else if (isEnd) rp = 'e';
+    else if (isStart) rp = 'b';
+    else if (isEnd) rp = 'f';
 
     std::string ret;
     ret = r.isWallFront() ? ". x . " : ". o . ";
