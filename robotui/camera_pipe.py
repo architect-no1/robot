@@ -1,7 +1,7 @@
 import time
 from base_camera import BaseCamera
 
-pipeName = "/home/pi/bin/pipe"
+pipeName = "/home/pi/robot/bin/pipe"
 
 class PipeCamera(BaseCamera):
   @staticmethod
