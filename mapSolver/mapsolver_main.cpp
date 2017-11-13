@@ -57,7 +57,7 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
             {
                 state = STATE_READY;
             }
-            else if(cmd == CMD_ACK)
+            else if(cmd == CMD_ACK || cmd == CMD_ACK_SIGN)
             {
                 step++;
 
@@ -72,8 +72,16 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                 befMovCmd = cmd_mov;
     #endif
 
-                mapMak.udatePos(befMovCmd);
-                mapMak.upateCurCell(envInfo);
+                if(cmd == CMD_ACK)
+                {
+                    mapMak.udatePos(befMovCmd);
+                    mapMak.updateCurCell(envInfo);
+                }
+                else if(cmd == CMD_ACK_SIGN)
+                {
+                    fprintf(stderr, "!!!!!!! ack sign \r\n");
+                    mapMak.updateCurCell_Sign(envInfo);
+                }
 
                 fprintf(stderr, "cur map, robot(%d, %d)\r\n", mapMak.cur_x, mapMak.cur_y);
                 mapMak.printf_curMap();
@@ -91,8 +99,9 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                 if(state == STATE_MAZE_SOLVE) // only works maze solving mode
                 {
                     // make path to go to unknown, and store in queue, and pop 1 item
-                    eMovCmd movCmd = mapSol.MapBuilder_1step(mapMak.map, mapMak.map_size, mapMak.map_size
-                        , mapMak.cur_x, mapMak.cur_y, mapMak.cur_heading);
+                    eMovCmd movCmd = mapSol.MapBuilder_1step(mapMak.map
+                                            , mapMak.map_size, mapMak.map_size
+                                            , mapMak.cur_x, mapMak.cur_y, mapMak.cur_heading);
 
                     if(movCmd == eMovCmd_STOP)
                     {
@@ -155,6 +164,8 @@ void MapSolver_main::Str2Dir(std::string str, eMovCmd *robotMov)
         dir = eMovCmd_RIGHT;
     else if(str.find("backward") != std::string::npos)
         dir = eMovCmd_UTURN;
+    else if(str.find("sign") != std::string::npos)
+        dir = eMovCmd_STOP;
 
     *robotMov = dir;
 }
@@ -176,6 +187,18 @@ void MapSolver_main::Str2Env(std::vector<std::string> str_list, CEnvInfo *env)
         env->center = 2; // end
     else if(str_list[4][0] == 'j')
         env->center = 3; // red dot
+}
+
+void MapSolver_main::Str2Sign(std::string str_list, CEnvInfo *env)
+{
+    env->clear();
+
+    if(str_list[0] == 'a')
+        env->frontSign = format("%c", str_list[1]);
+    if(str_list[0] == 'w')
+        env->leftSign = format("%c", str_list[1]);
+    if(str_list[0] == 'd')
+        env->rightSign = format("%c", str_list[1]);
 }
 
 CMD_TYPE MapSolver_main::parsing(std::string line, eMovCmd *robotMov, CEnvInfo *env)
@@ -209,6 +232,12 @@ CMD_TYPE MapSolver_main::parsing(std::string line, eMovCmd *robotMov, CEnvInfo *
             if(strs[2].find("cannot") != std::string::npos)
             {
                 rval = CMD_ACK_CANNOT;
+            }
+            else if(strs[1].find("sign") != std::string::npos)
+            {
+                rval = CMD_ACK_SIGN;
+
+                Str2Sign(strs[2], env);
             }
             else
             {

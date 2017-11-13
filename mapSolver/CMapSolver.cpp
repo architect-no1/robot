@@ -37,7 +37,7 @@ std::string CMapSolver::translate_eMovCMd2String(eMovCmd mov)
 		break;
 
     case eMovCmd_SEARCH_SIGN:
-		str = "search";
+        str = "sign";
 		break;
 
     case eMovCmd_STOP:
@@ -45,7 +45,7 @@ std::string CMapSolver::translate_eMovCMd2String(eMovCmd mov)
 		break;
 
     case eMovCmd_UTURN:
-		str = "backward";
+        str = "backward";
 		break;
 
 	default:
@@ -145,6 +145,16 @@ bool CMapSolver::checkCmdAvailable(eMovCmd cmd, eMapNode * map, int width, int h
 	return rval;
 }
 
+bool CMapSolver::CheckRedDot(eMapNode * map, int width, int height, int cur_x, int cur_y)
+{
+    bool rval = false;
+
+    if(map[cur_y*width + cur_x] == eMapNode_REDDOT)
+        rval = true;
+
+    return rval;
+}
+
 eMovCmd CMapSolver::MapBuilder_1step(eMapNode * map, int width, int height, int cur_x, int cur_y, int cur_heading)
 {
     eMovCmd nextMov = eMovCmd_STOP;
@@ -158,6 +168,11 @@ eMovCmd CMapSolver::MapBuilder_1step(eMapNode * map, int width, int height, int 
 
 		if (path.size() > 0)
 		{
+            // check current position RED DOT
+            // if RED DOT, add search command
+            if(CheckRedDot(map, width, height, cur_x, cur_y) == true)
+                pathQueue.push(eMovCmd_SEARCH_SIGN);
+
 			for (size_t i = 0; i < path.size(); i++)
 				pathQueue.push(path[i]);
 		}
@@ -172,6 +187,7 @@ eMovCmd CMapSolver::MapBuilder_1step(eMapNode * map, int width, int height, int 
 		nextMov = pathQueue.front();
 		pathQueue.pop();
 
+        // check cannot move situation
 		if (checkCmdAvailable(nextMov, map, width, height, cur_x, cur_y, cur_heading) == false)
 		{
             fprintf(stderr, "Cannot Move!!! make new path !! \r\n");

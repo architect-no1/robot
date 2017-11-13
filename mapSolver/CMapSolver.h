@@ -30,6 +30,7 @@ private:
 	bool checkCmdAvailable_left(eMapNode * map, int width, int cur_x, int cur_y);
 	bool checkCmdAvailable_right(eMapNode * map, int width, int cur_x, int cur_y);
 	std::vector<eMovCmd> FindPath_NearestUnknown(eMapNode * map, int width, int height, int cur_x, int cur_y, int cur_heading);
+    bool CheckRedDot(eMapNode * map, int width, int height, int cur_x, int cur_y);
 
 };
 
