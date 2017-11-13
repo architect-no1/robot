@@ -92,7 +92,14 @@ void MapMaker::update_core(CEnvInfo envInfo, int front_index, int left_index, in
         }
     }
     else
-        map[cur_y*MAP_SIZE + cur_x] = eMapNode_CLEAR;
+    {
+        if(map[cur_y*MAP_SIZE + cur_x] == eMapNode_UNKNOWN
+                || map[cur_y*MAP_SIZE + cur_x] == eMapNode_BACK
+                || map[cur_y*MAP_SIZE + cur_x] == eMapNode_CLEAR)
+        {
+            map[cur_y*MAP_SIZE + cur_x] = eMapNode_CLEAR;
+        }
+    }
 
 	if (envInfo.front == 1)
         map[front_index] = eMapNode_WALL;
