@@ -80,6 +80,21 @@ std::vector<cPoint> CFloodFill::makePath(int * dirmap, int w, int gx, int gy)
 	return path;
 }
 
+bool CFloodFill::checkUncertainUTurn(eMapNode *map, int w, int x, int y)
+{
+    bool rval = false;
+
+    if(map[y*w+x] == eMapNode_UNKNOWN
+        || map[y*w+x] == eMapNode_BACK
+        || map[y*w+x] == eMapNode_WALL)
+    {
+        rval = true;
+    }
+
+    return rval;
+
+}
+
 std::vector<cPoint> CFloodFill::solve(eMapNode * map, int width, int height
 									, int start_x, int start_y, int start_heading, eMapNode tarType)
 {
@@ -121,6 +136,12 @@ std::vector<cPoint> CFloodFill::solve(eMapNode * map, int width, int height
 				{
 					if (checkAlreadyChecked(dirmap, width, height, tx + 2, ty) == true)
 					{
+                        if(firstFlag == true
+                                &&  (start_heading == 180 || start_heading == -180)
+                                && checkUncertainUTurn(map, width, tx+2, ty) == true)
+                        {
+                        }
+
                         if(map[ty*width + (tx+2)] != eMapNode_WALL
                                 || firstFlag != true || (start_heading != 180 && start_heading != 180)) // uturn check
                         {
@@ -132,10 +153,15 @@ std::vector<cPoint> CFloodFill::solve(eMapNode * map, int width, int height
 
 				if (checkAvailable(map, dirmap, width, height, tx - 1, ty) == true)
 				{
-					if (checkAlreadyChecked(dirmap, width, height, tx - 2, ty) == true)
+                    if (checkAlreadyChecked(dirmap, width, height, tx-2, ty) == true)
 					{
-                        if(map[ty*width + (tx-2)] != eMapNode_WALL
-                                || firstFlag != true || (start_heading != 0)) // uturn check
+                        if(firstFlag == true
+                                && start_heading == 0
+                                && checkUncertainUTurn(map, width, tx-2, ty) == true)
+                        {
+
+                        }
+                        else
                         {
                             que.push(cPoint(tx - 2, ty));
                             dirmap[ty*width + (tx - 2)] = 1; // left
@@ -145,10 +171,15 @@ std::vector<cPoint> CFloodFill::solve(eMapNode * map, int width, int height
 
 				if (checkAvailable(map, dirmap, width, height, tx, ty + 1) == true)
 				{
-					if (checkAlreadyChecked(dirmap, width, height, tx, ty + 2) == true)
+                    if (checkAlreadyChecked(dirmap, width, height, tx, ty+2) == true)
 					{
-                        if(map[(ty+2)*width + tx] != eMapNode_WALL
-                                || firstFlag != true || (start_heading != -90)) // uturn check
+                        if(firstFlag == true
+                                && start_heading == -90
+                                && checkUncertainUTurn(map, width, tx, ty+2) == true)
+                        {
+
+                        }
+                        else
                         {
                             que.push(cPoint(tx, ty + 2));
                             dirmap[(ty + 2)*width + tx] = 2; // up
@@ -158,10 +189,15 @@ std::vector<cPoint> CFloodFill::solve(eMapNode * map, int width, int height
 
 				if (checkAvailable(map, dirmap, width, height, tx, ty - 1) == true)
 				{
-					if (checkAlreadyChecked(dirmap, width, height, tx, ty - 2) == true)
+                    if (checkAlreadyChecked(dirmap, width, height, tx, ty-2) == true)
 					{
-                        if(map[(ty-2)*width + tx] != eMapNode_WALL
-                                || firstFlag != true || (start_heading != 90)) // uturn check
+                        if(firstFlag == true
+                                && start_heading == 90
+                                && checkUncertainUTurn(map, width, tx, ty-2) == true)
+                        {
+
+                        }
+                        else
                         {
                             que.push(cPoint(tx, ty - 2));
                             dirmap[(ty - 2)*width + tx] = 4; // down

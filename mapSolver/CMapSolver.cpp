@@ -2,10 +2,12 @@
 #include "CMapSolver.h"
 #include "CFloodFill.h"
 #include <iostream>
+#include "Astar.h"
 
 CMapSolver::CMapSolver()
 {
-	pAlgo = new CFloodFill();
+    pAlgo = new CFloodFill();
+//    pAlgo = new CAstar();
 }
 
 CMapSolver::~CMapSolver()

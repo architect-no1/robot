@@ -7,7 +7,7 @@
 class CMapSolver
 {
 public:
-	CMapSolver();
+    CMapSolver();
 	~CMapSolver();
 
 	void init();
