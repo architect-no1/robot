@@ -228,6 +228,8 @@ $(document).ready(function(){
         ]; 
         if (isReddotStr(MA[y][x])) {
           signBlockArray.push([j, i, data]);
+        } else if (isUnknownStr(MA[y][x])) {
+          signBlockArray.push([j, i, data]);
         } else {  
           drawBlock(j, i, mapWidth, mapHeight, data);
         }
