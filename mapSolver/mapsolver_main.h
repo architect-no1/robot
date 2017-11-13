@@ -19,6 +19,7 @@ enum CMD_TYPE
     CMD_STOP,
     CMD_ACK,
     CMD_ACK_CANNOT,
+    CMD_ACK_SIGN,
     CMD_QUIT
 };
 
@@ -42,6 +43,7 @@ private:
     void Str2Dir(std::string str, eMovCmd *robotMov);
     void Str2Env(std::vector<std::string> str_list, CEnvInfo *env);
     CMD_TYPE parsing(std::string line, eMovCmd *robotMov, CEnvInfo *env);
+    void Str2Sign(std::string str_list, CEnvInfo *env);
 
     eMovCmd befMovCmd;
     CSimulRobot simul_robo;

@@ -62,7 +62,55 @@ enum eMapNode
     eMapNode_WALL,
     eMapNode_START,
     eMapNode_GOAL,
-    eMapNode_REDDOT
+    eMapNode_REDDOT,
+
+    eMapNode_W0, // 7
+    eMapNode_W1,
+    eMapNode_W2,
+    eMapNode_W3,
+    eMapNode_W4,
+    eMapNode_W5,
+    eMapNode_W6,
+    eMapNode_W7,
+    eMapNode_W8,
+    eMapNode_W9,
+    eMapNode_W10, // 17
+
+    eMapNode_A0, // 18
+    eMapNode_A1,
+    eMapNode_A2,
+    eMapNode_A3,
+    eMapNode_A4,
+    eMapNode_A5,
+    eMapNode_A6,
+    eMapNode_A7,
+    eMapNode_A8,
+    eMapNode_A9,
+    eMapNode_A10, // 28
+
+    eMapNode_D0,
+    eMapNode_D1,
+    eMapNode_D2,
+    eMapNode_D3,
+    eMapNode_D4,
+    eMapNode_D5,
+    eMapNode_D6,
+    eMapNode_D7,
+    eMapNode_D8,
+    eMapNode_D9,
+    eMapNode_D10,
+
+    eMapNode_S0,
+    eMapNode_S1,
+    eMapNode_S2,
+    eMapNode_S3,
+    eMapNode_S4,
+    eMapNode_S5,
+    eMapNode_S6,
+    eMapNode_S7,
+    eMapNode_S8,
+    eMapNode_S9,
+    eMapNode_S10
 };
 
 //missing string printf
