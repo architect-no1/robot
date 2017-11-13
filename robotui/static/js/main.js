@@ -19,6 +19,7 @@ const ACTION_SERVOUP = "servoup";
 const ACTION_SERVODOWN = "servodown";
 const ACTION_SERVOLEFT = "servoleft";
 const ACTION_SERVORIGHT = "servoright";
+const ACTION_CAPTURE = "capture";
 
 const ACTION_MAZE_END = "maze end";
 const ACTION_MAP_END = "map end";
@@ -89,7 +90,8 @@ $(document).ready(function(){
 
   $("#emul_6x4_empty").click(function() {
     //startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o o o o o o o o o o o x x o o o o rwo o o o o o o x x o o o o o o o o o o o x x o o o o o o o o o o o x x o o o o o o o o o o o x x o o o o o o o o o o o x x x x x x x x x x x x x x");
-    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js1 o o x o o o x o x x o x x x o x x x o x o x x o o e x o o s x o o rw x x x x x x x x x x x x x x");
+    //startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js1 o o x o o o x o x x o x x x o x x x o x o x x o o e x o o s x o o rw x x x x x x x x x x x x x x");
+    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o o o x x x x x o o o x x o o o x o o o x o o o x x o o o x x x x x o o o x x o o o o rw o o o o o o x x o o o o o o o o o o o x x o o o o o o o o o o o x x x x x x x x x x x x x x");
   });
 
   $("#emul_stop").click(function() {
@@ -149,6 +151,10 @@ $(document).ready(function(){
     mqttPublish("robot-request", ACTION_SERVORIGHT);
   });
 
+  $("#captureButton").click(function() {
+    mqttPublish("robot-request", ACTION_CAPTURE);
+  });
+
   $("#algorithm_ui").click(function() {
     $("#algorithmButton").text('UI\'s Algorithm');
     algorithmMode = true;
@@ -194,7 +200,6 @@ $(document).ready(function(){
           verifyMap(array[1], array[2], array.slice(3).join(" "));
           drawMap(array[1], array[2], array.slice(3).join(" "));
         } else if (array[0] == "maze" && array[1] =="end") {
-          console.log("Finish");
           drawLastMap("finishMapCanvas");
           var elapsedTime = (Date.now() - autoStartTime) / 1000;
           elapsedTime = elapsedTime.toFixed(1);
