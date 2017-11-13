@@ -121,7 +121,7 @@ std::vector<cPoint> CFloodFill::solve(eMapNode * map, int width, int height
 				{
 					if (checkAlreadyChecked(dirmap, width, height, tx + 2, ty) == true)
 					{
-                        if(map[ty*width + (tx+2)] == eMapNode_CLEAR
+                        if(map[ty*width + (tx+2)] != eMapNode_WALL
                                 || firstFlag != true || (start_heading != 180 && start_heading != 180)) // uturn check
                         {
                             que.push(cPoint(tx + 2, ty));
@@ -134,7 +134,7 @@ std::vector<cPoint> CFloodFill::solve(eMapNode * map, int width, int height
 				{
 					if (checkAlreadyChecked(dirmap, width, height, tx - 2, ty) == true)
 					{
-                        if(map[ty*width + (tx-2)] == eMapNode_CLEAR
+                        if(map[ty*width + (tx-2)] != eMapNode_WALL
                                 || firstFlag != true || (start_heading != 0)) // uturn check
                         {
                             que.push(cPoint(tx - 2, ty));
@@ -147,7 +147,7 @@ std::vector<cPoint> CFloodFill::solve(eMapNode * map, int width, int height
 				{
 					if (checkAlreadyChecked(dirmap, width, height, tx, ty + 2) == true)
 					{
-                        if(map[(ty+2)*width + tx] == eMapNode_CLEAR
+                        if(map[(ty+2)*width + tx] != eMapNode_WALL
                                 || firstFlag != true || (start_heading != -90)) // uturn check
                         {
                             que.push(cPoint(tx, ty + 2));
@@ -160,7 +160,7 @@ std::vector<cPoint> CFloodFill::solve(eMapNode * map, int width, int height
 				{
 					if (checkAlreadyChecked(dirmap, width, height, tx, ty - 2) == true)
 					{
-                        if(map[(ty-2)*width + tx] == eMapNode_CLEAR
+                        if(map[(ty-2)*width + tx] != eMapNode_WALL
                                 || firstFlag != true || (start_heading != 90)) // uturn check
                         {
                             que.push(cPoint(tx, ty - 2));
@@ -179,13 +179,13 @@ std::vector<cPoint> CFloodFill::solve(eMapNode * map, int width, int height
 
 	if (found_goal == true)
 	{
-        fprintf(stderr, "found goal (%d,%d)-(%d, %d)\r\n", start_x, start_y, goalpt.x, goalpt.y);
+        fprintf(stderr, "found goal (%d,%d)-(%d, %d)\n", start_x, start_y, goalpt.x, goalpt.y);
 
 		path = makePath(dirmap, width, goalpt.x, goalpt.y);
 	}
 	else
 	{
-        fprintf(stderr, "no path\r\n");
+        fprintf(stderr, "no path\n");
 	}
 
 	delete[] dirmap;

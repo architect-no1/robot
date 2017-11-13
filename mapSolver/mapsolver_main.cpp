@@ -79,11 +79,11 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                 }
                 else if(cmd == CMD_ACK_SIGN)
                 {
-                    fprintf(stderr, "!!!!!!! ack sign \r\n");
+                    fprintf(stderr, "!!!!!!! ack sign \n");
                     mapMak.updateCurCell_Sign(envInfo);
                 }
 
-                fprintf(stderr, "cur map, robot(%d, %d)\r\n", mapMak.cur_x, mapMak.cur_y);
+                fprintf(stderr, "cur map, robot(%d, %d)\n", mapMak.cur_x, mapMak.cur_y);
                 mapMak.printf_curMap();
 
                 // SEND CURRENT MAP
@@ -92,9 +92,9 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                 out_msg.push_back(mapMak.send_map());
     #endif
 
-                fprintf(stderr, "env info\r\n");
-                fprintf(stderr, ".%d.\r\n", envInfo.front);
-                fprintf(stderr, "%do%d\r\n", envInfo.left, envInfo.right);
+                fprintf(stderr, "env info\n");
+                fprintf(stderr, ".%d.\n", envInfo.front);
+                fprintf(stderr, "%do%d\n", envInfo.left, envInfo.right);
 
                 if(state == STATE_MAZE_SOLVE) // only works maze solving mode
                 {
@@ -113,13 +113,14 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                         // SEND MOV COMMAND TO ROBOT
                         out_msg.push_back("robot-control");
                         out_msg.push_back(mapSol.translate_eMovCMd2String(movCmd));
+                        fprintf(stderr, ">> robot command : %s\n\n", mapSol.translate_eMovCMd2String(movCmd).c_str());
                     }
                 }
 
                 // simulation mode
     #ifdef SIMUL_MODE
                 simul_robo.move(movCmd);
-                fprintf(stderr, "result cur robot (%d, %d, %d)\r\n"
+                fprintf(stderr, "result cur robot (%d, %d, %d)\n"
                         , simul_robo.cur_x, simul_robo.cur_y, simul_robo.cur_heading);
                 simul_robo.DrawMap();
 
@@ -193,12 +194,19 @@ void MapSolver_main::Str2Sign(std::string str_list, CEnvInfo *env)
 {
     env->clear();
 
-    if(str_list[0] == 'a')
-        env->frontSign = format("%c", str_list[1]);
     if(str_list[0] == 'w')
+        env->frontSign = format("%c", str_list[1]);
+    if(str_list[0] == 'a')
         env->leftSign = format("%c", str_list[1]);
     if(str_list[0] == 'd')
         env->rightSign = format("%c", str_list[1]);
+
+//    fprintf(stderr, "--- char : (%c) received sign : %s -> (%s, %s, %s)"
+//            , str_list[0]
+//            , str_list.c_str()
+//            , env->leftSign.c_str()
+//            , env->frontSign.c_str()
+//            , env->rightSign.c_str());
 }
 
 CMD_TYPE MapSolver_main::parsing(std::string line, eMovCmd *robotMov, CEnvInfo *env)
