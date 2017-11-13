@@ -41,6 +41,15 @@ float FindLineInImageAndComputeOffset(cv::Mat& CameraImage)
    //std::cout<<"Variance: "<<stddev.val[0]<<std::endl;
    GaussianBlur(mono, blur,Size(9, 9), 2, 2); // blur image to remove small irregularities
    threshold(blur, thresh, 0, 255, THRESH_BINARY_INV|THRESH_OTSU); //Color thresholding makes image more blacka nd white
+
+   cv::Mat hsv;
+   cvtColor(roi, hsv, cv::COLOR_BGR2HSV);
+   cv::Mat mask1, mask2;
+   inRange(hsv, cv::Scalar(0, 70, 50), cv::Scalar(10, 255, 255), mask1);
+   inRange(hsv, cv::Scalar(170, 70, 50), cv::Scalar(180, 255, 255), mask2);
+   cv::Mat mask = mask1 | mask2;
+   thresh |= mask;
+
    Mat erodeElmt = getStructuringElement(MORPH_RECT, Size(3,3));
    Mat dilateElmt = getStructuringElement(MORPH_RECT, Size(5,5));
    erode(thresh, erodeImg, erodeElmt);       // reduces noise Extract edges 
@@ -108,6 +117,14 @@ float FindLineInImageAndComputeOffset2(cv::Mat& CameraImage, bool &foundCrossing
    //std::cout<<"Variance: "<<stddev.val[0]<<std::endl;
    GaussianBlur(mono, blur,Size(9, 9), 2, 2); // blur image to remove small irregularities
    threshold(blur, thresh, 0, 255, THRESH_BINARY_INV|THRESH_OTSU); //Color thresholding makes image more blacka nd white
+   cv::Mat hsv;
+   cvtColor(roi, hsv, cv::COLOR_BGR2HSV);
+   cv::Mat mask1, mask2;
+   inRange(hsv, cv::Scalar(0, 70, 50), cv::Scalar(10, 255, 255), mask1);
+   inRange(hsv, cv::Scalar(170, 70, 50), cv::Scalar(180, 255, 255), mask2);
+   cv::Mat mask = mask1 | mask2;
+   thresh |= mask;
+
    Mat erodeElmt = getStructuringElement(MORPH_RECT, Size(3,3));
    Mat dilateElmt = getStructuringElement(MORPH_RECT, Size(5,5));
    erode(thresh, erodeImg, erodeElmt);       // reduces noise Extract edges 

@@ -41,7 +41,7 @@ void MapMaker::update_MapSize()
 	if(map_top < cur_y+1) map_top = cur_y+1;
 	if(map_bottom > cur_y-1) map_bottom = cur_y-1;
 
-	fprintf(stderr, "map info -> (%d, %d, %d, %d)\r\n", map_left, map_right, map_top, map_bottom);
+    fprintf(stderr, "map info -> (%d, %d, %d, %d)\n", map_left, map_right, map_top, map_bottom);
 }
 
 int MapMaker::Dir2Index(int heading, int x, int y, int w
@@ -83,7 +83,14 @@ void MapMaker::update_core(CEnvInfo envInfo, int front_index, int left_index, in
     else if(envInfo.center == 2) // end
         map[cur_y*MAP_SIZE + cur_x] = eMapNode_GOAL;
     else if(envInfo.center == 3) // red dot
-        map[cur_y*MAP_SIZE + cur_x] = eMapNode_REDDOT;
+    {
+        if(map[cur_y*MAP_SIZE + cur_x] == eMapNode_UNKNOWN
+              || map[cur_y*MAP_SIZE + cur_x] == eMapNode_BACK
+              || map[cur_y*MAP_SIZE + cur_x] == eMapNode_CLEAR)
+        {
+            map[cur_y*MAP_SIZE + cur_x] = eMapNode_REDDOT;
+        }
+    }
     else
         map[cur_y*MAP_SIZE + cur_x] = eMapNode_CLEAR;
 
@@ -132,7 +139,7 @@ void MapMaker::Dir2SignIndex(int heading
         *right = eMapNode_A0;
         *back = eMapNode_W0;
     }
-    else;// if(heading == 90)
+    else// if(heading == 180)
     {
         *front = eMapNode_A0;
         *left = eMapNode_S0;
@@ -149,9 +156,9 @@ void MapMaker::update_sign(CEnvInfo envInfo
     int index = cur_y*MAP_SIZE + cur_x;
     // current cell is REDDOT
     if(map[index] != eMapNode_REDDOT)
-        fprintf(stderr, "!!!!!!!! RED DOT ERROR\r\n");
+        fprintf(stderr, "!!!!!!!! RED DOT ERROR\n");
 
-    fprintf(stderr, "%s, %s, %s\r\n", envInfo.frontSign.c_str(), envInfo.leftSign.c_str(), envInfo.leftSign.c_str());
+    fprintf(stderr, "%s, %s, %s\n", envInfo.leftSign.c_str(), envInfo.frontSign.c_str(), envInfo.leftSign.c_str());
 
     if((int)envInfo.frontSign[0] >= (int)'0')
     {
@@ -159,17 +166,21 @@ void MapMaker::update_sign(CEnvInfo envInfo
 
         map[index] = (eMapNode)(front_index + inc);
 
-        fprintf(stderr, "---- %d -- %d\r\n" , inc, (int)map[index]);
+        fprintf(stderr, "front ---- %d -- %d\n" , inc, (int)map[index]);
     }
     else if((int)envInfo.leftSign[0] >= (int)'0')
     {
         int inc = (int)envInfo.leftSign[0] - (int)'0';
         map[index] = (eMapNode)(left_index + inc);
+
+        fprintf(stderr, "left ---- %d -- %d\n" , inc, (int)map[index]);
     }
     else if((int)envInfo.rightSign[0] >= (int)'0')
     {
         int inc = (int)envInfo.rightSign[0] - (int)'0';
         map[index] = (eMapNode)(right_index + inc);
+
+        fprintf(stderr, "right ---- %d -- %d\n" , inc, (int)map[index]);
     }
 }
 
@@ -186,7 +197,7 @@ void MapMaker::updateCurCell_Sign(CEnvInfo envInfo)
     }
     else
     {
-        fprintf(stderr, "overflow : (%d, %d)\r\n", cur_x, cur_y);
+        fprintf(stderr, "overflow : (%d, %d)\n", cur_x, cur_y);
         // throw overflow error !!!!
     }
 
@@ -205,7 +216,7 @@ void MapMaker::updateCurCell(CEnvInfo envInfo)
    }
    else
    {
-	   fprintf(stderr, "overflow : (%d, %d)\r\n", cur_x, cur_y);
+       fprintf(stderr, "overflow : (%d, %d)\n", cur_x, cur_y);
        // throw overflow error !!!!
    }
 }
@@ -219,7 +230,6 @@ void MapMaker::udatePos(eMovCmd dir)
 {
     if (dir != eMovCmd_STOP)
     {
-
        switch(dir)
        {
        case eMovCmd_FORWARD: // forward
@@ -264,7 +274,7 @@ void MapMaker::udatePos(eMovCmd dir)
            cur_y = MAP_SIZE - 1;
     }
 
-	fprintf(stderr, "cur pos -> (%d, %d, %d)\r\n", cur_x, cur_y, cur_heading);
+    fprintf(stderr, "cur pos -> (%d, %d, %d)\n", cur_x, cur_y, cur_heading);
     update_MapSize();
 }
 
@@ -371,7 +381,7 @@ std::string MapMaker::send_map()
 
                 tmpStr[tmpStr_pos] = 'j';
 
-                fprintf(stderr, "sign str : %s\r\n" , sign_str.c_str());
+                fprintf(stderr, "sign str : %s\n" , sign_str.c_str());
             }
             else if(grid_info == eMapNode_UNKNOWN) // unknown
                 tmpStr[tmpStr_pos] = '-';
@@ -412,12 +422,12 @@ std::string MapMaker::send_map()
             {
                 if(k == sign_x && i == sign_y)
                 {
-                    fprintf(stderr, "!!!! robot + sign : %s\r\n", sign_str.c_str());
+                    fprintf(stderr, "!!!! robot + sign : %s\n", sign_str.c_str());
                     outmsg += robo_str + sign_str;
                 }
                 else
                 {
-                    fprintf(stderr, "!!!! robot + normal : %s, (%d, %d), (%d, %d)\r\n", sign_str.c_str(), robo_x, robo_y, sign_x, sign_y);
+                    fprintf(stderr, "!!!! robot + normal : %s, (%d, %d), (%d, %d)\n", sign_str.c_str(), robo_x, robo_y, sign_x, sign_y);
                     outmsg += robo_str + format("%c ", tmpStr[i*map_width + k]);
                 }
             }
@@ -430,7 +440,7 @@ std::string MapMaker::send_map()
         }
     }
 
-    fprintf(stderr, ">> send map : %s\r\n", outmsg.c_str());
+    fprintf(stderr, ">> send map : %s\n", outmsg.c_str());
 
     return outmsg;
 }
@@ -481,7 +491,7 @@ void MapMaker::printf_curMap()
    int robo_x = cur_x - map_left;
    int robo_y = cur_y - map_bottom;
 
-   fprintf(stderr, "map %d %d \r\n", map_width, map_height);
+   fprintf(stderr, "map %d %d \n", map_width, map_height);
    for(int i = map_height -1; i >= 0; i--)
    {
        for(int k = 0; k < map_width; k++)
@@ -491,7 +501,7 @@ void MapMaker::printf_curMap()
            else
                 fprintf(stderr,"%c", tmpStr[i*map_width + k]);
        }
-       fprintf(stderr,"\r\n");
+       fprintf(stderr,"\n");
    }
-   fprintf(stderr, "\r\n");
+   fprintf(stderr, "\n");
 }

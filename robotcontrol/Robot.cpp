@@ -389,6 +389,13 @@ public:
       case BACKWARD2:
         r->setWheelSpeed(BASESPEED, 0);
         if (TICKS_TURN <= ticks) {
+          ticks = 0;
+          state = BACKWARD3;
+        }
+        break;
+      case BACKWARD3:
+        r->followLineForward();
+        if (5 <= ticks) {
           r->backwardComplete();
         }
         break;
@@ -403,6 +410,7 @@ private:
   enum {
     BACKWARD1,
     BACKWARD2,
+    BACKWARD3,
   } state;
 };
 

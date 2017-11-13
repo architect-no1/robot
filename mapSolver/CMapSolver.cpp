@@ -178,7 +178,7 @@ eMovCmd CMapSolver::MapBuilder_1step(eMapNode * map, int width, int height, int 
 		}
 		else
 		{
-            fprintf(stderr, "!!! There is NO path\r\n");
+            fprintf(stderr, "!!! There is NO path\n");
 		}
 	}
 
@@ -190,7 +190,7 @@ eMovCmd CMapSolver::MapBuilder_1step(eMapNode * map, int width, int height, int 
         // check cannot move situation
 		if (checkCmdAvailable(nextMov, map, width, height, cur_x, cur_y, cur_heading) == false)
 		{
-            fprintf(stderr, "Cannot Move!!! make new path !! \r\n");
+            fprintf(stderr, "Cannot Move!!! make new path !! \n");
 
 			// pathQueue.clear()
 			while (pathQueue.size() > 0) pathQueue.pop();
@@ -207,7 +207,7 @@ eMovCmd CMapSolver::MapBuilder_1step(eMapNode * map, int width, int height, int 
 			}
 			else
 			{
-                fprintf(stderr, "!!! There is NO path\r\n");
+                fprintf(stderr, "!!! There is NO path\n");
 			}
 		}
 	}

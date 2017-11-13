@@ -28,7 +28,7 @@ int UdpSendImageAsJpeg(TUdpLocalPort * UdpLocalPort,TUdpDest *dest,cv::Mat Image
             fclose(pFile);
         }
     }
-    return(SendUDPMsg(UdpLocalPort,dest,sendbuff.data(), sendbuff.size()));
+    return 0;
 }
 
 //-----------------------------------------------------------------

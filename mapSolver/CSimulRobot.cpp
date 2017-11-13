@@ -43,9 +43,9 @@ void CSimulRobot::DrawMap()
             else
                 fprintf(stderr, "%d ", test_map[k*test_map_size + i]);
         }
-        fprintf(stderr, "\r\n");
+        fprintf(stderr, "\n");
     }
-    fprintf(stderr, "\r\n");
+    fprintf(stderr, "\n");
 }
 
 CSimulRobot::CSimulRobot()

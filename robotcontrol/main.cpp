@@ -48,8 +48,8 @@ public:
   std::string wallsToMapString(bool isRedDot, bool isStart, bool isEnd) {
     char rp = 'o';
     if (isRedDot) rp = 'j';
-    else if (isStart) rp = 's';
-    else if (isEnd) rp = 'e';
+    else if (isStart) rp = 'b';
+    else if (isEnd) rp = 'f';
 
     std::string ret;
     ret = r.isWallFront() ? ". x . " : ". o . ";
@@ -83,6 +83,14 @@ public:
     onMoveComplete("backward", false, false, false);
   }
 
+  void capture(cv::Mat &mat) {
+    static int id = 0;
+    std::string filename = "capture/";
+    filename += id;
+    filename += ".jpg";
+    imwrite(filename.c_str(), mat);
+  }
+
   virtual void onCheckSignComplete(std::string forward,
                                    std::string left,
                                    std::string right) {
@@ -91,12 +99,13 @@ public:
     else if (0 < left.length()) signmap += "a" + left;
     else if (0 < right.length()) signmap += "d" + right;
 
-    printf("ack sign %s\n", signmap.c_str());
-    fflush(stdout);
-
     if (0 == signmap.length()) {
       // TODO: error
+      printf("ack sign cannot\n");
+    } else {
+      printf("ack sign %s\n", signmap.c_str());
     }
+    fflush(stdout);
   }
 
   void processCommand(std::string cmd) {
@@ -168,6 +177,8 @@ public:
       r.stop();
       printf("ack stop\n");
       fflush(stdout);
+    } else if (cmd.find("capture") != std::string::npos) {
+      capture(r.getCamera());
     }
   }
 

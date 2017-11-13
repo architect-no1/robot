@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
             for(int i = 0; i < outmsg.size(); i+=2)
             {
                 if(outmsg[i].find("robot-control") != std::string::npos)
-                    printf("%s\r\n", outmsg[i+1].c_str());
+                    printf("%s\n", outmsg[i+1].c_str());
                 else if(outmsg[i].find("algorithm-response") != std::string::npos)
-                    printf("%s\r\n", outmsg[i+1].c_str());
+                    printf("%s\n", outmsg[i+1].c_str());
 
                 fflush(stdout);
             }
