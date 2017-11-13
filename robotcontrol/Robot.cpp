@@ -237,8 +237,9 @@ public:
           ticks = 0;
         }
         if (TICKS_BEFORE_CROSSING_GUARD <= ticks) {
-          // TODO: error
-          r->stop();
+          fprintf(stderr, "timeout!!!\n");
+          state = AFTER_CROSSING;
+          ticks = 0;
         }
       }
       break;
@@ -310,12 +311,14 @@ public:
         bool foundCrossing = false;
         r->followLineForward(foundCrossing);
         if (isRedDot || foundCrossing) {
+          printf("turn forward tick %d\n", ticks);
           state = AFTER_CROSSING;
           ticks = 0;
         }
         if (TICKS_BEFORE_CROSSING_GUARD <= ticks) {
-          // TODO: error
-          r->stop();
+          printf("turn forward tick %d\n", ticks);
+          state = AFTER_CROSSING;
+          ticks = 0;
         }
       }
         break;
