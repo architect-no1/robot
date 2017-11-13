@@ -99,12 +99,13 @@ public:
     else if (0 < left.length()) signmap += "a" + left;
     else if (0 < right.length()) signmap += "d" + right;
 
-    printf("ack sign %s\n", signmap.c_str());
-    fflush(stdout);
-
     if (0 == signmap.length()) {
       // TODO: error
+      printf("ack sign cannot\n");
+    } else {
+      printf("ack sign %s\n", signmap.c_str());
     }
+    fflush(stdout);
   }
 
   void processCommand(std::string cmd) {
