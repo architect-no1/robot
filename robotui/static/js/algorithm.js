@@ -51,6 +51,10 @@ $(document).ready(function(){
         var mm = array.slice(2).join(" ");
         var target = getTargetPosition(algorithmCurX, algorithmCurY);
         
+        console.log(discoveredMap);
+        console.log(target);
+        console.log(mm);
+
         discoveredMap[target.y][target.x] = eraseRobotStr(discoveredMap[target.y][target.x]);
         var result = getNextPosition(algorithmCurX, algorithmCurY, algorithmCurDir, array[1]);
         algorithmCurX = result.x;

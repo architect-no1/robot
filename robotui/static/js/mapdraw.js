@@ -77,31 +77,6 @@ $(document).ready(function(){
         context.lineTo(startX + blockSize / 2, startY + blockSize);
         context.stroke();
       }
-            
-      // draw wall
-      context.beginPath();
-      context.lineWidth = wallLineWidth;
-      //context.strokeStyle = '#178298';
-      context.strokeStyle = '#000';
-      context.lineCap="round";
-      
-      if (data[0][1] == 'x') {
-        context.moveTo(startX, startY);
-        context.lineTo(startX + blockSize, startY);
-      }
-      if (data[1][0] == 'x') {
-        context.moveTo(startX, startY);
-        context.lineTo(startX, startY + blockSize);
-      }
-      if (data[1][2] == 'x') {
-        context.moveTo(startX + blockSize, startY);
-        context.lineTo(startX + blockSize, startY + blockSize);
-      }
-      if (data[2][1] == 'x') {
-        context.moveTo(startX, startY + blockSize);
-        context.lineTo(startX + blockSize, startY + blockSize);
-      }
-      context.stroke();
 
       // draw unkown wall
       context.beginPath();
@@ -123,6 +98,32 @@ $(document).ready(function(){
         context.lineTo(startX + blockSize, startY + blockSize);
       }
       if (data[2][1] == '-' || data[2][1] == '?') {
+        context.moveTo(startX, startY + blockSize);
+        context.lineTo(startX + blockSize, startY + blockSize);
+      }
+      context.stroke();
+
+            
+      // draw wall
+      context.beginPath();
+      context.lineWidth = wallLineWidth;
+      //context.strokeStyle = '#178298';
+      context.strokeStyle = '#000';
+      context.lineCap="round";
+      
+      if (data[0][1] == 'x') {
+        context.moveTo(startX, startY);
+        context.lineTo(startX + blockSize, startY);
+      }
+      if (data[1][0] == 'x') {
+        context.moveTo(startX, startY);
+        context.lineTo(startX, startY + blockSize);
+      }
+      if (data[1][2] == 'x') {
+        context.moveTo(startX + blockSize, startY);
+        context.lineTo(startX + blockSize, startY + blockSize);
+      }
+      if (data[2][1] == 'x') {
         context.moveTo(startX, startY + blockSize);
         context.lineTo(startX + blockSize, startY + blockSize);
       }
@@ -215,6 +216,8 @@ $(document).ready(function(){
     
     // draw map
     var signBlockArray = [];
+    var unknownBlockArray = [];
+    var normalBlockArray = [];
     MA = strToMap(mapWidth, mapHeight, mapString);
 
     for (var i = 0; i < mapHeight; i++) {
@@ -228,27 +231,23 @@ $(document).ready(function(){
         ]; 
         if (isReddotStr(MA[y][x])) {
           signBlockArray.push([j, i, data]);
+        } else if (isUnknownStr(MA[y][x]) || isUnknownStr(MA[y-1][x]) || isUnknownStr(MA[y+1][x]) || isUnknownStr(MA[y][x-1]) || isUnknownStr(MA[y][x+1])) {
+          unknownBlockArray.push([j, i, data]);
         } else {  
-          drawBlock(j, i, mapWidth, mapHeight, data);
+          normalBlockArray.push([j, i, data]);
         }
       }
     }
-    for (var i = 0; i < signBlockArray.length; i++) {
-      var item = signBlockArray[i];
+
+    var mapFunc = function(item) {
       drawBlock(item[0], item[1], mapWidth, mapHeight, item[2]);
-    }
+    };
+
+    unknownBlockArray.map(mapFunc);
+    normalBlockArray.map(mapFunc);
+    signBlockArray.map(mapFunc);
   };
 
-  //mapString = "x x x x x x o o o x x o x o x x rss x e x x x x x x"
-  //drawMap(2, 2, mapString);
-  
-  //mapString = "x x x x x x x x x x o o o x o o o x x o x o x o x o x x o x da7 x o x o x x o x o x o x o x x 0 x o x o x o x x o x o x o x o x x ras x o o dd1s4 x e x x - x x x x x x x";
-  //drawMap(4, 4, mapString);
-  //drawMap(4, 4, mapString, "smallMapCanvas", true);
-  
-  //mapString = "x x x x x x x x x x x x x x o o o o o o o o o o o x x o x x x o x x x o o o x x o x o x o o o x ds1 o o x x o x o x o x o x x x o x x o o o o o x o o o x o x x o x x x o x x x o x o x x o o e x o o s x o o rw x x x x x x x x x x x x x x"
-  //drawMap(6, 4, mapString);
-  
   drawInitMap = function() {
     drawMap(1, 1, "o o o o r o o o o");  
   }
