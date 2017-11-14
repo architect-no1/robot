@@ -233,11 +233,11 @@ public:
         bool foundCrossing = false;
         r->followLineForward(foundCrossing);
         if (isRedDot || foundCrossing) {
+          fprintf(stderr, "forward tick %d\n", ticks);
           state = AFTER_CROSSING;
           ticks = 0;
         }
         if (TICKS_BEFORE_CROSSING_GUARD <= ticks) {
-          fprintf(stderr, "timeout!!!\n");
           state = AFTER_CROSSING;
           ticks = 0;
         }
@@ -288,9 +288,12 @@ public:
       ticks(0), state(TURN), isLeft(_isLeft),
       isRedDot(false), isStart(false), isEnd(false) {
     r->followLineForwardInit();
+    timestart();
   }
 
   ~TurnBehavior() {
+    timeend();
+    timediff();
   }
 
   virtual void tick() {
@@ -311,12 +314,11 @@ public:
         bool foundCrossing = false;
         r->followLineForward(foundCrossing);
         if (isRedDot || foundCrossing) {
-          printf("turn forward tick %d\n", ticks);
+          fprintf(stderr, "turn forward tick %d\n", ticks);
           state = AFTER_CROSSING;
           ticks = 0;
         }
         if (TICKS_BEFORE_CROSSING_GUARD <= ticks) {
-          printf("turn forward tick %d\n", ticks);
           state = AFTER_CROSSING;
           ticks = 0;
         }
@@ -374,9 +376,13 @@ void Robot::rightComplete(bool isRedDot, bool isStart, bool isEnd) {
 class BackwardBehavior : public Robot::Behavior {
 public:
   BackwardBehavior(Robot* r) : Behavior(r),
-      ticks(0), state(BACKWARD1) { }
+      ticks(0), state(BACKWARD1) {
+    timestart();
+  }
 
   ~BackwardBehavior() {
+    timeend();
+    timediff();
   }
 
   virtual void tick() {
