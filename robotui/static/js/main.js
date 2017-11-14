@@ -32,7 +32,7 @@ var autoStartTime = 0;
 
 $(document).ready(function(){
   
-  $("#ipInput").val("128.237.181.46");
+  $("#ipInput").val("172.20.10.14");
   
   var mqttClient = null;
   
@@ -85,7 +85,7 @@ $(document).ready(function(){
   });
 
   $("#emul_6x4").click(function() {
-    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o rw o o o o x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js1 o o x o o o x o x x o x x x o x x x o x o x x o o f x o o b x o o o x x x x x x x x x x x x x x");
+    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js1 o o x o o o x o x x o x x x o x x x o x o x x o o f x o o b x o o rw x x x x x x x x x x x x x x");
   });
 
   $("#emul_6x4_empty").click(function() {
@@ -204,7 +204,16 @@ $(document).ready(function(){
           var elapsedTime = (Date.now() - autoStartTime) / 1000;
           elapsedTime = elapsedTime.toFixed(1);
 
+          $("#finishLabel").text("Maze Mapping Finish");
           $("#countLabel").text(elapsedTime + " secs / " + array[2] + " moves");
+          $("#finishModal").modal('show');
+        } else if (array[0] == "maze" && array[1] =="fail") {
+          drawLastMap("finishMapCanvas");
+          var elapsedTime = (Date.now() - autoStartTime) / 1000;
+          elapsedTime = elapsedTime.toFixed(1);
+
+          $("#finishLabel").text("Maze Mapping Fail");
+          $("#countLabel").text(array.slice(2).join(" "));
           $("#finishModal").modal('show');
         }
       }  
