@@ -18,7 +18,13 @@ INCLUDE_DIRECTORIES(
 ADD_LIBRARY(sensor ${SENSOR_SOURCES})
 TARGET_LINK_LIBRARIES(sensor ${SENSOR_LIBS})
 
-SET(ROBOT_SOURCES Robot.cpp ImageProcessing.cpp PID.cpp Signs.cpp Camera.cpp
+SET(ROBOT_SOURCES
+  Robot.cpp
+  ImageProcessing.cpp
+  PID.cpp
+  Signs.cpp
+  Camera.cpp
+  Config.cpp
   demo/Common/Servos.cpp
   demo/Common/NetworkUDP.cpp
   demo/Common/UdpSendRecvJpeg.cpp
