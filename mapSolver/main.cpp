@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    fprintf(stderr, "ver 1.0 astar\n");
+    fprintf(stderr, "ver 1.1 astar\n");
     std::string line;
     MapSolver_main mapSol_main;
 

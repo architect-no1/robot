@@ -131,6 +131,10 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                     fprintf(stderr, "!!!!!!! ack sign \n");
                     mapMak.updateCurCell_Sign(envInfo);
                 }
+                else if(cmd == CMD_ACK_SIGN_CANNOT)
+                {
+                    fprintf(stderr, "!!!!!!! ack sign CANNOT \n");
+                }
 
                 fprintf(stderr, "cur map, robot(%d, %d)\n", mapMak.cur_x, mapMak.cur_y);
                 mapMak.printf_curMap();
@@ -292,19 +296,24 @@ CMD_TYPE MapSolver_main::parsing(std::string line, eMovCmd *robotMov, CEnvInfo *
     {
         if(strs[0].find("ack") != std::string::npos)
         {
-            if(strs[2].find("cannot") != std::string::npos)
+            if(strs[1].find("sign") != std::string::npos)
             {
-                rval = CMD_ACK_CANNOT;
-            }
-            else if(strs[1].find("sign") != std::string::npos)
-            {
-                if(strs[2].find("cannot") != std::string::npos)
+                if(strs.size() < 3 || strs[2].size() == 0)
+                {
+                    fprintf(stderr, "!!!!!! sign cannot recognized\n");
+                    rval = CMD_ACK_SIGN_CANNOT;
+                }
+                else if(strs[2].find("cannot") != std::string::npos)
                     rval = CMD_ACK_SIGN_CANNOT;
                 else
                 {
                     rval = CMD_ACK_SIGN;
                     Str2Sign(strs[2], env);
                 }
+            }
+            else if(strs[2].find("cannot") != std::string::npos)
+            {
+                rval = CMD_ACK_CANNOT;
             }
             else
             {

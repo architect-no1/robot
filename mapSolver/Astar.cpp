@@ -296,6 +296,7 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
         fprintf(stderr, "no path\n");
     }
 
+    delete[] headTable;
     delete[] s_cost;
     return path;
 }
