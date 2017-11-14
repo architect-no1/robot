@@ -17,6 +17,46 @@ void MapSolver_main::init()
     step = 0;
 }
 
+bool MapSolver_main::checkEndCondition(eMapNode * map, int width, int height, std::string * errMsg)
+{
+    bool rval = true;
+
+    int cnt_goal = 0;
+    int cnt_start = 0;
+    int cnt_reddot = 0;
+
+    for(int i = 0; i < height; i++)
+    {
+        for(int k = 0; k < width; k++)
+        {
+            if(map[i*width+k] == eMapNode_START)
+                cnt_start++;
+            if(map[i*width+k] == eMapNode_GOAL)
+                cnt_goal++;
+            if(map[i*width+k] >= eMapNode_REDDOT)
+                cnt_reddot++;
+        }
+    }
+
+    if(cnt_goal == 0)
+    {
+        rval = false;
+        *errMsg = "Cannot detect GOAL\n";
+    }
+    if(cnt_start == 0)
+    {
+        rval = false;
+        *errMsg = "Cannot detect START\n";
+    }
+    if(cnt_reddot == 0)
+    {
+        rval = false;
+        *errMsg = "Cannot detect RED-DOT\n";
+    }
+
+    return rval;
+}
+
 std::vector<std::string> MapSolver_main::process(std::string msg)
 {
     std::vector<std::string> out_msg;
@@ -35,8 +75,8 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
 
         mapMak.udatePos(eMovCmd_STOP);
 
-        out_msg.push_back("algorithm-response");
-        out_msg.push_back("ack map start");
+        out_msg.push_back("algorithm-response\n");
+        out_msg.push_back("ack map start\n");
     }
     else if(cmd == CMD_MAZE_START)
     {
@@ -44,10 +84,19 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
         mapMak.init();
         state = STATE_MAZE_SOLVE;
 
-        out_msg.push_back("algorithm-response");
-        out_msg.push_back("ack maze start");
-        out_msg.push_back("robot-control");
-        out_msg.push_back("current");
+        out_msg.push_back("algorithm-response\n");
+        out_msg.push_back("ack maze start\n");
+        out_msg.push_back("robot-control\n");
+        out_msg.push_back("current\n");
+    }
+    else if(cmd == CMD_ACK_SIGN_CANNOT)
+    {
+        step = 0;
+        mapMak.init();
+        state = STATE_READY;
+
+        out_msg.push_back("algorithm-response\n");
+        out_msg.push_back("maze fail Cannot find SIGN\n");
     }
     else
     {
@@ -57,7 +106,7 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
             {
                 state = STATE_READY;
             }
-            else if(cmd == CMD_ACK || cmd == CMD_ACK_SIGN)
+            else if(cmd == CMD_ACK || cmd == CMD_ACK_SIGN || cmd == CMD_ACK_CANNOT)
             {
                 step++;
 
@@ -106,7 +155,13 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                     if(movCmd == eMovCmd_STOP)
                     {
                         out_msg.push_back("algorithm-response");
-                        out_msg.push_back(format("maze end %d", step));
+
+                        std::string errMsg;
+                        bool conditionEnd = checkEndCondition(mapMak.map, mapMak.map_size, mapMak.map_size, &errMsg);
+                        if(conditionEnd == true)
+                            out_msg.push_back(format("maze end %d", step));
+                        else
+                            out_msg.push_back("maze fail " + errMsg);
                     }
                     else
                     {
@@ -243,9 +298,13 @@ CMD_TYPE MapSolver_main::parsing(std::string line, eMovCmd *robotMov, CEnvInfo *
             }
             else if(strs[1].find("sign") != std::string::npos)
             {
-                rval = CMD_ACK_SIGN;
-
-                Str2Sign(strs[2], env);
+                if(strs[2].find("cannot") != std::string::npos)
+                    rval = CMD_ACK_SIGN_CANNOT;
+                else
+                {
+                    rval = CMD_ACK_SIGN;
+                    Str2Sign(strs[2], env);
+                }
             }
             else
             {

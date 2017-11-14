@@ -78,26 +78,27 @@ int MapMaker::Dir2Index(int heading, int x, int y, int w
 
 void MapMaker::update_core(CEnvInfo envInfo, int front_index, int left_index, int right_index, int back_index)//, int x, int y)
 {
+    int center_index = cur_y*MAP_SIZE + cur_x;
     if(envInfo.center == 1) // start
-        map[cur_y*MAP_SIZE + cur_x] = eMapNode_START;
+        map[center_index] = eMapNode_START;
     else if(envInfo.center == 2) // end
-        map[cur_y*MAP_SIZE + cur_x] = eMapNode_GOAL;
+        map[center_index] = eMapNode_GOAL;
     else if(envInfo.center == 3) // red dot
     {
-        if(map[cur_y*MAP_SIZE + cur_x] == eMapNode_UNKNOWN
-              || map[cur_y*MAP_SIZE + cur_x] == eMapNode_BACK
-              || map[cur_y*MAP_SIZE + cur_x] == eMapNode_CLEAR)
+        if(map[center_index] == eMapNode_UNKNOWN
+              || map[center_index] == eMapNode_BACK
+              || map[center_index] == eMapNode_CLEAR)
         {
-            map[cur_y*MAP_SIZE + cur_x] = eMapNode_REDDOT;
+            map[center_index] = eMapNode_REDDOT;
         }
     }
     else
     {
-        if(map[cur_y*MAP_SIZE + cur_x] == eMapNode_UNKNOWN
-                || map[cur_y*MAP_SIZE + cur_x] == eMapNode_BACK
-                || map[cur_y*MAP_SIZE + cur_x] == eMapNode_CLEAR)
+        if(map[center_index] == eMapNode_UNKNOWN
+                || map[center_index] == eMapNode_BACK
+                || map[center_index] == eMapNode_CLEAR)
         {
-            map[cur_y*MAP_SIZE + cur_x] = eMapNode_CLEAR;
+            map[center_index] = eMapNode_CLEAR;
         }
     }
 

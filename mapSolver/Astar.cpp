@@ -10,7 +10,7 @@ CAstar::CAstar()
 
 }
 
-bool CAstar::checkAvailable(eMapNode *map, int * scost_map, int w, int h, int x, int y)
+bool CAstar::checkAvailable(eMapNode *map, int w, int h, int x, int y)
 {
     bool rval = false;
 
@@ -173,9 +173,14 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
     int * s_cost = new int[width*height];
     memset(s_cost, -1, sizeof(int) * width*height);
 
+    int * headTable = new int[width*height];
+    memset(headTable, 0, sizeof(int) * width*height);
+
+
     std::vector<stAstarEle> ptList;
 
     s_cost[start_y*width + start_x] = 0;
+    headTable[start_y*width + start_x] = start_heading;
     ptList.push_back(stAstarEle(cPoint(start_x, start_y), 0));
 
     while (looplife)
@@ -202,7 +207,7 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
             {
                 int parent_sCost = s_cost[ty*width+tx];
 
-                if (checkAvailable(map, s_cost, width, height, tx + 1, ty) == true)
+                if (checkAvailable(map, width, height, tx + 1, ty) == true)
                 {
                     if (checkAlreadyChecked(s_cost, width, height, tx + 2, ty) == true)
                     {
@@ -220,7 +225,7 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                     }
                 }
 
-                if (checkAvailable(map, s_cost, width, height, tx - 1, ty) == true)
+                if (checkAvailable(map, width, height, tx - 1, ty) == true)
                 {
                     if (checkAlreadyChecked(s_cost, width, height, tx - 2, ty) == true)
                     {
@@ -238,7 +243,7 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                     }
                 }
 
-                if (checkAvailable(map, s_cost, width, height, tx, ty + 1) == true)
+                if (checkAvailable(map, width, height, tx, ty + 1) == true)
                 {
                     if (checkAlreadyChecked(s_cost, width, height, tx, ty + 2) == true)
                     {
@@ -256,7 +261,7 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                     }
                 }
 
-                if (checkAvailable(map, s_cost, width, height, tx, ty - 1) == true)
+                if (checkAvailable(map, width, height, tx, ty - 1) == true)
                 {
                     if (checkAlreadyChecked(s_cost, width, height, tx, ty - 2) == true)
                     {

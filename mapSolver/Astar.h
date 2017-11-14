@@ -13,7 +13,7 @@ public:
 
 private:
     bool checkAlreadyChecked(int * dirmap, int w, int h, int x, int y);
-    bool checkAvailable(eMapNode *map, int * dirmap, int w, int h, int x, int y);
+    bool checkAvailable(eMapNode *map, int w, int h, int x, int y);
     std::vector<cPoint> makePath(eMapNode *map, int * s_cost, int w, int gx, int gy);
     int checkMinDir(eMapNode *map, int * s_cost, int w, int x, int y);
     bool checkUncertainUTurn(eMapNode *map, int w, int x, int y);

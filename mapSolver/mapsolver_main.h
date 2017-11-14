@@ -20,6 +20,7 @@ enum CMD_TYPE
     CMD_ACK,
     CMD_ACK_CANNOT,
     CMD_ACK_SIGN,
+    CMD_ACK_SIGN_CANNOT,
     CMD_QUIT
 };
 
@@ -44,6 +45,8 @@ private:
     void Str2Env(std::vector<std::string> str_list, CEnvInfo *env);
     CMD_TYPE parsing(std::string line, eMovCmd *robotMov, CEnvInfo *env);
     void Str2Sign(std::string str_list, CEnvInfo *env);
+    bool checkEndCondition(eMapNode * map, int width, int height, string *errMsg);
+
 
     eMovCmd befMovCmd;
     CSimulRobot simul_robo;
