@@ -85,7 +85,7 @@ $(document).ready(function(){
   });
 
   $("#emul_6x4").click(function() {
-    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o rs x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o j o o x o o o x o x x o x x x o x x x o x o x x o o f x o o b x o o o x x x x x x x x x x x x x x");
+    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o rw x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js3 o o x o o o x o x x o x x x o x x x o x o x x o o f x o o b x o o o x x x x x x x x x x x x x x");
   });
 
   $("#emul_6x4_empty").click(function() {
