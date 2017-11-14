@@ -237,7 +237,7 @@ public:
           state = AFTER_CROSSING;
           ticks = 0;
         }
-        if (TICKS_BEFORE_CROSSING_GUARD <= ticks) {
+        if (TICKS_FORWARD_BEFORE_CROSSING_GUARD <= ticks) {
           state = AFTER_CROSSING;
           ticks = 0;
         }
@@ -318,7 +318,7 @@ public:
           state = AFTER_CROSSING;
           ticks = 0;
         }
-        if (TICKS_BEFORE_CROSSING_GUARD <= ticks) {
+        if (TICKS_TURN_BEFORE_CROSSING_GUARD <= ticks) {
           state = AFTER_CROSSING;
           ticks = 0;
         }
