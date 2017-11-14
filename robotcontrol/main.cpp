@@ -133,7 +133,7 @@ public:
       fflush(stdout);
     } else if (cmd.find("current") != std::string::npos) {
       char rp = 'o';
-      if (yolo::findGreen(r.getCamera())) rp = 's';
+      if (yolo::findGreen(r.getCamera())) rp = 'b';
       std::string ret;
       ret = r.isWallFront() ? ". x . " : ". o . ";
       ret += r.isWallLeft() ? "x "     : "o ";
