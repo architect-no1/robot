@@ -6,6 +6,7 @@
 #include <string>
 
 #include "Robot.h"
+#include "Config.h"
 
 static bool haveStdin() {
   fd_set fds;
@@ -33,6 +34,7 @@ private:
 public:
   EventHandler(const char *ip, const char *port) {
     r.setListener(this);
+    yolo::loadConfig();
 
     if ((UdpLocalPort = OpenUdpPort(0)) == NULL) {
       printf("OpenUdpPort Failed\n");

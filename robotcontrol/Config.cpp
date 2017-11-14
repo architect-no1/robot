@@ -1,20 +1,60 @@
 #include "Config.h"
 
-#include "../config4cpp/Configuration.h"
+#include <fstream>
+#include <map>
+#include <string>
 
 namespace yolo {
 
-#define BASESPEED_DEFAULT 6
-int BASESPEED = BASESPEED_DEFAULT;
+int BASESPEED = 6;
 
-static Configuration *cfg = NULL;
+int TICKS_FORWARD_BEFORE_CROSSING_GUARD = 60;
+int TICKS_AFTER_CROSSING = 21;
 
-void readBaseConfig(const char *filename) {
-  cfg = Configuration::create();
-  try {
-    cfg->parse(filename);
-    BASESPEED = cfg->lookupInt("", "BASESPEED", BASESPEED_DEFAULT);
-  } catch (ConfigurationException e) {
+int TICKS_TURN = 52;
+int TICKS_TURN_BEFORE_CROSSING_GUARD = 24;
+
+int TICKS_CHECKSIGN_MOVE = 35;
+int TICKS_CHECKSIGN_TURNSERVOS = 20;
+int TICKS_CHECKSIGN_CHECKSIGN = 20;
+
+int CAMERA_CHECKSIGN_FORWARD_PAN = 150;
+int CAMERA_CHECKSIGN_FORWARD_TILT = 156;
+
+int CAMERA_CHECKSIGN_LEFT_PAN = 200;
+int CAMERA_CHECKSIGN_LEFT_TILT = 150;
+
+int CAMERA_CHECKSIGN_RIGHT_PAN = 93;
+int CAMERA_CHECKSIGN_RIGHT_TILT = 162;
+
+
+static std::map<std::string, int> tag_map;
+
+int loadConfig() {
+  std::ifstream file("config.txt");
+  std::string str;
+  while (std::getline(file, str)) {
+    std::string key;
+
+    int positionOfEquals = str.find("=");
+
+    key = str.substr(0, positionOfEquals);
+
+    if (positionOfEquals != std::string::npos) {
+      int value = std::stoi(str.substr(positionOfEquals + 1));
+      tag_map[key] = value;
+
+#define ASSIGN_CONFIG(x) \
+      do { \
+        if (key.compare(#x) == 0) x = value; \
+      } while (0)
+      ASSIGN_CONFIG(BASESPEED);
+      ASSIGN_CONFIG(TICKS_FORWARD_BEFORE_CROSSING_GUARD);
+      ASSIGN_CONFIG(TICKS_AFTER_CROSSING);
+      ASSIGN_CONFIG(TICKS_TURN);
+      ASSIGN_CONFIG(TICKS_TURN_BEFORE_CROSSING_GUARD);
+      ASSIGN_CONFIG(TICKS_CHECKSIGN_MOVE);
+    }
   }
 }
 
