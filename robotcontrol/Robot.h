@@ -77,6 +77,7 @@ public:
   void stop();
 
   Camera c;
+  Sensor sensor;
 
   class Behavior;
 
@@ -90,8 +91,6 @@ private:
   CvCapture* capture;
 
   void updateCamera();
-
-  Sensor sensor;
 
   TPID PID;
 };

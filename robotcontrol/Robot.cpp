@@ -97,12 +97,12 @@ bool Robot::isWallFront() {
 
 bool Robot::isWallLeft() {
   //return false;
-  return sensor.left/10 < WALL_DISTANCE_MAX;
+  return sensor.left < WALL_DISTANCE_MAX;
 }
 
 bool Robot::isWallRight() {
   //return false;
-  return sensor.right/10 < WALL_DISTANCE_MAX;
+  return sensor.right < WALL_DISTANCE_MAX;
 }
 
 void Robot::pause() {

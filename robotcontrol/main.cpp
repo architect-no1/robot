@@ -7,6 +7,7 @@
 
 #include "Robot.h"
 #include "Config.h"
+#include <opencv2/imgproc/imgproc.hpp>
 
 static bool haveStdin() {
   fd_set fds;
@@ -133,7 +134,7 @@ public:
       fflush(stdout);
     } else if (cmd.find("current") != std::string::npos) {
       char rp = 'o';
-      if (yolo::findGreen(r.getCamera())) rp = 's';
+      if (yolo::findGreen(r.getCamera())) rp = 'b';
       std::string ret;
       ret = r.isWallFront() ? ". x . " : ". o . ";
       ret += r.isWallLeft() ? "x "     : "o ";
@@ -193,6 +194,13 @@ public:
       }
 
       r.runOneLoop();
+
+      std::string text = std::to_string(r.sensor.front);
+      cv::putText(r.getCamera(), text,cv::Point(130,30),  CV_FONT_HERSHEY_PLAIN, 2,CV_RGB(0,0,0),3);
+      text = std::to_string(r.sensor.left);
+      cv::putText(r.getCamera(), text,cv::Point(10,100),  CV_FONT_HERSHEY_PLAIN, 2,CV_RGB(0,0,0),3);
+      text = std::to_string(r.sensor.right);
+      cv::putText(r.getCamera(), text,cv::Point(250,100),  CV_FONT_HERSHEY_PLAIN, 2,CV_RGB(0,0,0),3);
       UdpSendImageAsJpeg(UdpLocalPort, UdpDest, r.getCamera());
 
       // TODO: write sensor update

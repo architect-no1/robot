@@ -58,8 +58,8 @@ void Sensor::update() {
 
   // by millimeters
   // sensor work by timer thus affect fps. consider doing in another thread?
-  left = getDistance(ObjectNum_1);
-  right = getDistance(ObjectNum_0);
+  left = getDistance(ObjectNum_1) / 10;
+  right = getDistance(ObjectNum_0) / 10;
 }
 
 void Sensor::startThread() {
