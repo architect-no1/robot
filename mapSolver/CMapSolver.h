@@ -7,7 +7,7 @@
 class CMapSolver
 {
 public:
-    CMapSolver();
+    CMapSolver(int algo_mode);
 	~CMapSolver();
 
 	void init();

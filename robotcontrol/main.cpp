@@ -7,6 +7,7 @@
 
 #include "Robot.h"
 #include "Config.h"
+#include <opencv2/imgproc/imgproc.hpp>
 
 static bool haveStdin() {
   fd_set fds;
@@ -133,7 +134,7 @@ public:
       fflush(stdout);
     } else if (cmd.find("current") != std::string::npos) {
       char rp = 'o';
-      if (yolo::findGreen(r.getCamera())) rp = 's';
+      if (yolo::findGreen(r.getCamera())) rp = 'b';
       std::string ret;
       ret = r.isWallFront() ? ". x . " : ". o . ";
       ret += r.isWallLeft() ? "x "     : "o ";
@@ -185,6 +186,10 @@ public:
   }
 
   void run() {
+    time_t lastUpdate = 0;
+    int lastFps = 0;
+    int fps = 0;
+
     do {
       if (haveStdin()) {
         std::string line;
@@ -193,6 +198,26 @@ public:
       }
 
       r.runOneLoop();
+
+      time_t current = time(0);
+      double seconds_passed = difftime(current, lastUpdate);
+      if (1 < seconds_passed) {
+        lastFps = fps;
+        lastUpdate = current;
+        fps = 0;
+      }
+      fps++;
+
+      std::string text = std::to_string(r.sensor.front);
+      cv::putText(r.getCamera(), text,cv::Point(140,30),  CV_FONT_HERSHEY_PLAIN, 2,CV_RGB(200,0,0),3);
+      text = std::to_string(r.sensor.left);
+      cv::putText(r.getCamera(), text,cv::Point(10,100),  CV_FONT_HERSHEY_PLAIN, 2,CV_RGB(200,0,0),3);
+      text = std::to_string(r.sensor.right);
+      cv::putText(r.getCamera(), text,cv::Point(280 - 10 * text.length(),100),  CV_FONT_HERSHEY_PLAIN, 2,CV_RGB(200,0,0),3);
+
+      text = std::to_string(lastFps) + "lps";
+      cv::putText(r.getCamera(), text,cv::Point(120,210),  CV_FONT_HERSHEY_PLAIN, 2,CV_RGB(200,0,0),3);
+
       UdpSendImageAsJpeg(UdpLocalPort, UdpDest, r.getCamera());
 
       // TODO: write sensor update

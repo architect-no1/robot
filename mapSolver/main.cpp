@@ -1,12 +1,23 @@
 #include <stdio.h>
 #include <iostream>
 #include "mapsolver_main.h"
+#include <string>
 
 int main(int argc, char *argv[])
 {
-    fprintf(stderr, "ver 1.0 astar\n");
+    int algo_mode = 0;
+
+    fprintf(stderr, "ver 1.3 red dot finish\n");
+
+    if(argc > 1)
+    {
+        std::string arg_str(argv[1]);
+        if(arg_str.find("-ff") != std::string::npos)
+            algo_mode = 1;
+    }
+
     std::string line;
-    MapSolver_main mapSol_main;
+    MapSolver_main mapSol_main(algo_mode);
 
     mapSol_main.init();
 

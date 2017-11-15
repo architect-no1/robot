@@ -16,11 +16,13 @@ enum CMD_TYPE
     CMD_NOTHING,
     CMD_MAZE_START,
     CMD_MAP_START,
+    CMD_MAP_CLEAR,
     CMD_STOP,
     CMD_ACK,
     CMD_ACK_CANNOT,
     CMD_ACK_SIGN,
     CMD_ACK_SIGN_CANNOT,
+
     CMD_QUIT
 };
 
@@ -34,7 +36,8 @@ enum STATE
 class MapSolver_main
 {
 public:
-    MapSolver_main();
+    MapSolver_main(int algo_mode);
+    ~MapSolver_main();
 
     void init();
     std::vector<std::string> process(std::string msg);
@@ -51,7 +54,7 @@ private:
     eMovCmd befMovCmd;
     CSimulRobot simul_robo;
 
-    CMapSolver mapSol;
+    CMapSolver * pMapSol;
     MapMaker mapMak;
 
     int step;

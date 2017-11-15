@@ -23,13 +23,13 @@ bool CAstar::checkAvailable(eMapNode *map, int w, int h, int x, int y)
     return rval;
 }
 
-bool CAstar::checkAlreadyChecked(int * scost_map, int w, int h, int x, int y)
+bool CAstar::checkAlreadyChecked(float * scost_map, int w, int h, int x, int y)
 {
     bool rval = false;
 
     if (x >= 0 && x < w && y >= 0 && y < h)
     {
-        if(scost_map[y*w + x] == -1)
+        if(scost_map[y*w + x] < 0)
             rval = true;
     }
     else
@@ -38,7 +38,7 @@ bool CAstar::checkAlreadyChecked(int * scost_map, int w, int h, int x, int y)
     return rval;
 }
 
-int CAstar::checkMinDir(eMapNode *map, int * s_cost, int w, int x, int y)
+int CAstar::checkMinDir(eMapNode *map, float * s_cost, int w, int x, int y)
 {
     int rval;
 
@@ -46,25 +46,25 @@ int CAstar::checkMinDir(eMapNode *map, int * s_cost, int w, int x, int y)
     int dir2;
     int dir;
 
-    int value_ori = s_cost[y*w + x];
+    float value_ori = s_cost[y*w + x];
 
-    int value[4];
+    float value[4];
 
     value[0] = s_cost[(y+0)*w + x-2];
     value[1] = s_cost[(y+2)*w + x+0];
     value[2] = s_cost[(y+0)*w + x+2];
     value[3] = s_cost[(y-2)*w + x+0];
 
-    if(value[0] == -1 || map[(y+0)*w+(x-1)] == eMapNode_WALL)
+    if(value[0] < 0 || map[(y+0)*w+(x-1)] == eMapNode_WALL)
         value[0] = 9999;
 
-    if(value[1] == -1 || map[(y+1)*w+(x+0)] == eMapNode_WALL)
+    if(value[1] < 0 || map[(y+1)*w+(x+0)] == eMapNode_WALL)
         value[1] = 9999;
 
-    if(value[2] == -1 || map[(y+0)*w+(x+1)] == eMapNode_WALL)
+    if(value[2] < 0 || map[(y+0)*w+(x+1)] == eMapNode_WALL)
         value[2] = 9999;
 
-    if(value[3] == -1 || map[(y-1)*w+(x+0)] == eMapNode_WALL)
+    if(value[3] < 0 || map[(y-1)*w+(x+0)] == eMapNode_WALL)
         value[3] = 9999;
 
 
@@ -91,7 +91,7 @@ int CAstar::checkMinDir(eMapNode *map, int * s_cost, int w, int x, int y)
     return rval;
 }
 
-std::vector<cPoint> CAstar::makePath(eMapNode *map, int * s_cost, int w, int gx, int gy)
+std::vector<cPoint> CAstar::makePath(eMapNode *map, float * s_cost, int w, int gx, int gy)
 {
     std::vector<cPoint> path;
     std::vector<cPoint> path_inv;
@@ -160,6 +160,70 @@ bool CAstar::checkUncertainUTurn(eMapNode *map, int w, int x, int y)
 
 }
 
+float CAstar::calcCost_left(int bef_heading)
+{
+    float cost = 0;
+
+    if(bef_heading == 0)
+        cost = 3.62f;
+    else if(bef_heading == 90)
+        cost = 3.09;
+    else if(bef_heading == -90)
+        cost = 3.09f;
+    else
+        cost = 2.6f;
+
+    return cost;
+}
+
+float CAstar::calcCost_right(int bef_heading)
+{
+    float cost = 0;
+
+    if(bef_heading == 0)
+        cost = 2.6f;
+    else if(bef_heading == 90)
+        cost = 3.09;
+    else if(bef_heading == -90)
+        cost = 3.09f;
+    else
+        cost = 3.62f;
+
+    return cost;
+}
+
+float CAstar::calcCost_up(int bef_heading)
+{
+    float cost = 0;
+
+    if(bef_heading == 0)
+        cost = 3.09f;
+    else if(bef_heading == 90)
+        cost = 2.6f;
+    else if(bef_heading == -90)
+        cost = 3.62f;
+    else
+        cost = 3.09;
+
+    return cost;
+}
+
+float CAstar::calcCost_down(int bef_heading)
+{
+    float cost = 0;
+
+    if(bef_heading == 0)
+        cost = 3.09f;
+    else if(bef_heading == 90)
+        cost = 3.62f;
+    else if(bef_heading == -90)
+        cost = 2.6f;
+    else
+        cost = 3.09f;
+
+    return cost;
+}
+
 std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                         , int start_x, int start_y, int start_heading
                         , eMapNode tarType)
@@ -170,8 +234,9 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
     cPoint goalpt;
     bool found_goal = false;
 
-    int * s_cost = new int[width*height];
-    memset(s_cost, -1, sizeof(int) * width*height);
+    float * s_cost = new float[width*height];
+    for(int i = 0; i < width*height; i++)
+        s_cost[i] = -100;
 
     int * headTable = new int[width*height];
     memset(headTable, 0, sizeof(int) * width*height);
@@ -205,8 +270,10 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
             }
             else
             {
-                int parent_sCost = s_cost[ty*width+tx];
+                int parent_heading = headTable[ty*width+tx];
+                float parent_sCost = s_cost[ty*width+tx];
 
+                // right
                 if (checkAvailable(map, width, height, tx + 1, ty) == true)
                 {
                     if (checkAlreadyChecked(s_cost, width, height, tx + 2, ty) == true)
@@ -219,12 +286,14 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                         }
                         else // uturn check
                         {
-                            s_cost[ty*width + (tx+2)] = parent_sCost+2;
+                            headTable[ty*width + (tx+2)] = 0;
+                            s_cost[ty*width + (tx+2)] = parent_sCost + calcCost_right(parent_heading);
                             ptList.push_back(stAstarEle(cPoint(tx+2, ty), parent_sCost+2));
                         }
                     }
                 }
 
+                // left
                 if (checkAvailable(map, width, height, tx - 1, ty) == true)
                 {
                     if (checkAlreadyChecked(s_cost, width, height, tx - 2, ty) == true)
@@ -237,12 +306,14 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                         }
                         else
                         {
-                            s_cost[ty*width + (tx-2)] = parent_sCost+2;
+                            headTable[ty*width + (tx+2)] = 180;
+                            s_cost[ty*width + (tx-2)] = parent_sCost + calcCost_left(parent_heading);
                             ptList.push_back(stAstarEle(cPoint(tx-2, ty), parent_sCost+2));
                         }
                     }
                 }
 
+                // up
                 if (checkAvailable(map, width, height, tx, ty + 1) == true)
                 {
                     if (checkAlreadyChecked(s_cost, width, height, tx, ty + 2) == true)
@@ -255,12 +326,14 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                         }
                         else
                         {
-                            s_cost[(ty+2)*width + tx] = parent_sCost+2;
+                            headTable[ty*width + (tx+2)] = 90;
+                            s_cost[(ty+2)*width + tx] = parent_sCost + calcCost_up(parent_heading);
                             ptList.push_back(stAstarEle(cPoint(tx, ty+2), parent_sCost+2));
                         }
                     }
                 }
 
+                // down
                 if (checkAvailable(map, width, height, tx, ty - 1) == true)
                 {
                     if (checkAlreadyChecked(s_cost, width, height, tx, ty - 2) == true)
@@ -273,7 +346,8 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                         }
                         else
                         {
-                            s_cost[(ty-2)*width + tx] = parent_sCost+2;
+                            headTable[ty*width + (tx+2)] = -90;
+                            s_cost[(ty-2)*width + tx] = parent_sCost + calcCost_down(parent_heading);
                             ptList.push_back(stAstarEle(cPoint(tx, ty-2), parent_sCost+2));
                         }
                     }
@@ -296,6 +370,7 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
         fprintf(stderr, "no path\n");
     }
 
+    delete[] headTable;
     delete[] s_cost;
     return path;
 }

@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include "mapsolver_main.h"
 
-MapSolver_main::MapSolver_main()
+MapSolver_main::MapSolver_main(int algo_mode)
 {
+    pMapSol = new CMapSolver(algo_mode);
+}
 
+MapSolver_main::~MapSolver_main()
+{
+    delete pMapSol;
 }
 
 void MapSolver_main::init()
@@ -12,7 +17,7 @@ void MapSolver_main::init()
     befMovCmd = eMovCmd_STOP;
 
     mapMak.init();
-    mapSol.init();
+    pMapSol->init();
 
     step = 0;
 }
@@ -67,10 +72,18 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
 
     CMD_TYPE cmd = parsing(msg, &cmd_mov, &envInfo) ;
 
-    if(cmd == CMD_MAP_START)
+    if(cmd == CMD_MAP_CLEAR)
     {
         step = 0;
         mapMak.init();
+
+        out_msg.push_back("algorithm-response\n");
+        out_msg.push_back("ack map clear\n");
+    }
+    else if(cmd == CMD_MAP_START)
+    {
+        step = 0;
+
         state = STATE_MAP_DRAW;
 
         mapMak.udatePos(eMovCmd_STOP);
@@ -81,7 +94,6 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
     else if(cmd == CMD_MAZE_START)
     {
         step = 0;
-        mapMak.init();
         state = STATE_MAZE_SOLVE;
 
         out_msg.push_back("algorithm-response\n");
@@ -131,6 +143,10 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                     fprintf(stderr, "!!!!!!! ack sign \n");
                     mapMak.updateCurCell_Sign(envInfo);
                 }
+                else if(cmd == CMD_ACK_SIGN_CANNOT)
+                {
+                    fprintf(stderr, "!!!!!!! ack sign CANNOT \n");
+                }
 
                 fprintf(stderr, "cur map, robot(%d, %d)\n", mapMak.cur_x, mapMak.cur_y);
                 mapMak.printf_curMap();
@@ -148,7 +164,7 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                 if(state == STATE_MAZE_SOLVE) // only works maze solving mode
                 {
                     // make path to go to unknown, and store in queue, and pop 1 item
-                    eMovCmd movCmd = mapSol.MapBuilder_1step(mapMak.map
+                    eMovCmd movCmd = pMapSol->MapBuilder_1step(mapMak.map
                                             , mapMak.map_size, mapMak.map_size
                                             , mapMak.cur_x, mapMak.cur_y, mapMak.cur_heading);
 
@@ -167,8 +183,9 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                     {
                         // SEND MOV COMMAND TO ROBOT
                         out_msg.push_back("robot-control");
-                        out_msg.push_back(mapSol.translate_eMovCMd2String(movCmd));
-                        fprintf(stderr, ">> robot command : %s\n\n", mapSol.translate_eMovCMd2String(movCmd).c_str());
+                        out_msg.push_back(pMapSol->translate_eMovCMd2String(movCmd));
+                        fprintf(stderr, ">> robot command : %s\n\n"
+                                , pMapSol->translate_eMovCMd2String(movCmd).c_str());
                     }
                 }
 
@@ -282,29 +299,36 @@ CMD_TYPE MapSolver_main::parsing(std::string line, eMovCmd *robotMov, CEnvInfo *
         {
             rval = CMD_MAZE_START;
         }
-        else if(strs[0].find("map") != std::string::npos
-                && strs[1].find("start") != std::string::npos  )
+        else if(strs[0].find("map") != std::string::npos)
         {
-            rval = CMD_MAP_START;
+            if(strs[1].find("start") != std::string::npos  )
+                rval = CMD_MAP_START;
+            else
+                rval = CMD_MAP_CLEAR;
         }
     }
     else
     {
         if(strs[0].find("ack") != std::string::npos)
         {
-            if(strs[2].find("cannot") != std::string::npos)
+            if(strs[1].find("sign") != std::string::npos)
             {
-                rval = CMD_ACK_CANNOT;
-            }
-            else if(strs[1].find("sign") != std::string::npos)
-            {
-                if(strs[2].find("cannot") != std::string::npos)
+                if(strs.size() < 3 || strs[2].size() == 0)
+                {
+                    fprintf(stderr, "!!!!!! sign cannot recognized\n");
+                    rval = CMD_ACK_SIGN_CANNOT;
+                }
+                else if(strs[2].find("cannot") != std::string::npos)
                     rval = CMD_ACK_SIGN_CANNOT;
                 else
                 {
                     rval = CMD_ACK_SIGN;
                     Str2Sign(strs[2], env);
                 }
+            }
+            else if(strs[2].find("cannot") != std::string::npos)
+            {
+                rval = CMD_ACK_CANNOT;
             }
             else
             {
