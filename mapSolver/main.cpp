@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     int algo_mode = 0;
 
-    fprintf(stderr, "ver 1.3 red dot finish\n");
+    fprintf(stderr, "ver 1.4 random + trap escape\n");
 
     if(argc > 1)
     {

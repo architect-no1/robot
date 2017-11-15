@@ -132,8 +132,8 @@ std::vector<cPoint> CAstar::makePath(eMapNode *map, float * s_cost, int w, int g
 struct stAstarEle
 {
     cPoint pt;
-    int t_cost;
-    stAstarEle(cPoint point, int cost)
+    float t_cost;
+    stAstarEle(cPoint point, float cost)
     {
         pt = point;
         t_cost = cost;
@@ -273,6 +273,8 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                 int parent_heading = headTable[ty*width+tx];
                 float parent_sCost = s_cost[ty*width+tx];
 
+                bool ThereIsWay = false;
+
                 // right
                 if (checkAvailable(map, width, height, tx + 1, ty) == true)
                 {
@@ -286,9 +288,11 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                         }
                         else // uturn check
                         {
+                            ThereIsWay = true;
                             headTable[ty*width + (tx+2)] = 0;
-                            s_cost[ty*width + (tx+2)] = parent_sCost + calcCost_right(parent_heading);
-                            ptList.push_back(stAstarEle(cPoint(tx+2, ty), parent_sCost+2));
+                            float new_cost = parent_sCost + calcCost_right(parent_heading);
+                            s_cost[ty*width + (tx+2)] = new_cost;
+                            ptList.push_back(stAstarEle(cPoint(tx+2, ty), new_cost));
                         }
                     }
                 }
@@ -306,9 +310,11 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                         }
                         else
                         {
-                            headTable[ty*width + (tx+2)] = 180;
-                            s_cost[ty*width + (tx-2)] = parent_sCost + calcCost_left(parent_heading);
-                            ptList.push_back(stAstarEle(cPoint(tx-2, ty), parent_sCost+2));
+                            ThereIsWay = true;
+                            headTable[ty*width + (tx-2)] = 180;
+                            float new_cost = parent_sCost + calcCost_left(parent_heading);
+                            s_cost[ty*width + (tx-2)] = new_cost;
+                            ptList.push_back(stAstarEle(cPoint(tx-2, ty), new_cost));
                         }
                     }
                 }
@@ -326,9 +332,11 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                         }
                         else
                         {
-                            headTable[ty*width + (tx+2)] = 90;
-                            s_cost[(ty+2)*width + tx] = parent_sCost + calcCost_up(parent_heading);
-                            ptList.push_back(stAstarEle(cPoint(tx, ty+2), parent_sCost+2));
+                            ThereIsWay = true;
+                            headTable[(ty+2)*width + tx] = 90;
+                            float new_cost = parent_sCost + calcCost_up(parent_heading);
+                            s_cost[(ty+2)*width + tx] = new_cost;
+                            ptList.push_back(stAstarEle(cPoint(tx, ty+2), new_cost));
                         }
                     }
                 }
@@ -346,15 +354,50 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                         }
                         else
                         {
-                            headTable[ty*width + (tx+2)] = -90;
-                            s_cost[(ty-2)*width + tx] = parent_sCost + calcCost_down(parent_heading);
-                            ptList.push_back(stAstarEle(cPoint(tx, ty-2), parent_sCost+2));
+                            ThereIsWay = true;
+                            headTable[(ty-2)*width + tx] = -90;
+                            float new_cost = parent_sCost + calcCost_down(parent_heading);
+                            s_cost[(ty-2)*width + tx] = new_cost;
+                            ptList.push_back(stAstarEle(cPoint(tx, ty-2), new_cost));
                         }
                     }
                 }
 
                 if(firstFlag == true)
+                {
                     firstFlag = false;
+
+                    if(ThereIsWay == false)
+                    {
+                        int uturn_x, uturn_y;
+
+                        if(start_heading == 0)
+                        {
+                            uturn_x = start_x - 2;
+                            uturn_y = start_y;
+                        }
+                        else if(start_heading == 90)
+                        {
+                            uturn_x = start_x;
+                            uturn_y = start_y-2;
+                        }
+                        else if(start_heading == -90)
+                        {
+                            uturn_x = start_x;
+                            uturn_y = start_y+2;
+                        }
+                        else
+                        {
+                            uturn_x = start_x + 2;
+                            uturn_y = start_y;
+                        }
+
+                        headTable[uturn_y*width + uturn_x] = -90;
+                        float new_cost = parent_sCost + 3.62f;
+                        s_cost[uturn_y*width + uturn_x] = new_cost;
+                        ptList.push_back(stAstarEle(cPoint(uturn_x, uturn_y), new_cost));
+                    }
+                }
             }
         }
     }
