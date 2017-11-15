@@ -67,10 +67,18 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
 
     CMD_TYPE cmd = parsing(msg, &cmd_mov, &envInfo) ;
 
-    if(cmd == CMD_MAP_START)
+    if(cmd == CMD_MAP_CLEAR)
     {
         step = 0;
         mapMak.init();
+
+        out_msg.push_back("algorithm-response\n");
+        out_msg.push_back("ack map clear\n");
+    }
+    else if(cmd == CMD_MAP_START)
+    {
+        step = 0;
+
         state = STATE_MAP_DRAW;
 
         mapMak.udatePos(eMovCmd_STOP);
@@ -81,7 +89,6 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
     else if(cmd == CMD_MAZE_START)
     {
         step = 0;
-        mapMak.init();
         state = STATE_MAZE_SOLVE;
 
         out_msg.push_back("algorithm-response\n");
@@ -286,10 +293,12 @@ CMD_TYPE MapSolver_main::parsing(std::string line, eMovCmd *robotMov, CEnvInfo *
         {
             rval = CMD_MAZE_START;
         }
-        else if(strs[0].find("map") != std::string::npos
-                && strs[1].find("start") != std::string::npos  )
+        else if(strs[0].find("map") != std::string::npos)
         {
-            rval = CMD_MAP_START;
+            if(strs[1].find("start") != std::string::npos  )
+                rval = CMD_MAP_START;
+            else
+                rval = CMD_MAP_CLEAR;
         }
     }
     else
