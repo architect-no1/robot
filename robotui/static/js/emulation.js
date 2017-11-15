@@ -12,10 +12,12 @@ $(document).ready(function(){
     appendLog(EMUL, "Start emulation " + width + "x" + height, false);
 
     emulationMap = strToMap(width, height, map);
+    console.log(emulationMap);
     emulationMapWidth = width;
     emulationMapHeight = height;
 
     var robot = findRobot(emulationMap);
+    console.log(robot);
     emulationCurX = robot.x;
     emulationCurY = robot.y;
     emulationCurDir = robot.dir;
@@ -28,6 +30,7 @@ $(document).ready(function(){
     drawInitMap();
     drawSmallMap(width, height, map);
 
+    mqttPublish("algorithm-request", "map clear");  
     mqttPublish("algorithm-request", "map start");  
   }; 
 
@@ -47,10 +50,16 @@ $(document).ready(function(){
   doEmulation = function(message) {
     message = message.trim();
     
-    if (message != ACTION_CURRENT && message != ACTION_FORWARD && message != ACTION_LEFT && message != ACTION_RIGHT && message != ACTION_BACKWARD && message != ACTION_SIGN) {
+    if (message != ACTION_CURRENT && message != ACTION_FORWARD && message != ACTION_LEFT && message != ACTION_RIGHT && message != ACTION_BACKWARD && message != ACTION_SIGN
+        && message != ACTION_PAUSE && message != ACTION_RESUME && message != ACTION_STOP) {
       appendLog(EMUL, "Invalid command");
       return;
     }   
+
+    if (message == ACTION_PAUSE || message == ACTION_RESUME || message == ACTION_STOP) {
+      mqttPublish("robot-response", "ack " + message);
+      return;
+    }
 
     // check move possible
     var r = getMap(emulationMap, emulationCurX, emulationCurY, emulationCurDir);

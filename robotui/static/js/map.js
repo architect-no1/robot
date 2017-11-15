@@ -156,11 +156,13 @@ $(document).ready(function() {
   };
     
   findRobot = function(map, erase = false) {
+    console.log(map);
     var height = (map.length - 1) / 2;
     var width = (map[0].length - 1) / 2;
     
     for (var i = 0; i < height; i++) {
       for (var j = 0; j < width; j++) {
+        console.log(j, i, map[i * 2 + 1][j * 2 + 1]);
         var robot = getRobotStr(map[i * 2 + 1][j * 2 + 1]);
         var current = eraseRobotStr(map[i * 2 + 1][j * 2 + 1]);
         if (erase) {
@@ -254,6 +256,7 @@ $(document).ready(function() {
   rotatedSignStr = function(sign, dir) {
     if (sign.length != 2) {
       appendLog(ERROR, "sign string is too short or too long : " + sign, true);
+      return "cannot";
     }
     signDir = sign.charAt(0);
     signNum = sign.charAt(1);   

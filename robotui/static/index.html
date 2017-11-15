@@ -55,19 +55,46 @@
 		    <div class="modal-content">
 		      <div class="modal-header">
 		        <h5 class="modal-title" id="exampleModalLabel">Notification</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 		          <span aria-hidden="true">&times;</span>
 		        </button>
 		      </div>
 		      <div class="mx-auto">
 		        <p class="text-center">
-            <h2 id="finishLabel">Maze Mapping Finish</h2>
-            <h3 id="countLabel">0/0</h3>
+            <h2 id="finishLabel" class="text-center">Maze Mapping Finish</h2>
+            <h3 id="countLabel" class="text-center">0/0</h3>
             <canvas id="finishMapCanvas" width="400" height="400"></canvas>
 		        </p>
           </div>
 		      <div class="modal-footer">
 		        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+    <!-- Suspend Connected Modal -->
+    <div class="modal fade" id="suspendModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog  modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="exampleModalLabel">Suspend Mode</h5>
+            <!--
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+            -->
+		      </div>
+		      <div class="mx-auto">
+		        <p class="text-center">
+            <h2 id="suspendLabel" class="text-center">Maze Mapping Suspend</h2>
+            <h3 id="suspendDescLabel" class="text-center">...</h3>
+            <canvas id="failMapCanvas" width="400" height="400"></canvas>
+		        </p>
+          </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-primary" data-dismiss="modal" id="suspendManualButton">Manual</button>
+		        <button type="button" class="btn btn-danger" data-dismiss="modal" id="suspendResumeButton">Resume Autonomous</button>
 		      </div>
 		    </div>
 		  </div>
@@ -89,13 +116,13 @@
         <img src="image/arrow.jpg" id="arrowImage" style="display:none;">
         
         <div class="col rounded bg-info m-2 p-1">
-          <canvas id="mapCanvas" width="650" height="380"></canvas>
+          <canvas id="mapCanvas" width="700px" height="350px"></canvas>
         </div>
         <div class="col m-1 p-1" >
           
           <!-- Notification Panel -->
           <div class="alert alert-info" role="alert">
-              <span class="badge badge-primary"><h2 id="modeLabel">Suspend</h2></span> &nbsp;&nbsp;
+              <span class="badge badge-warning" id="modeBadge"><h2 id="modeLabel">INITIAL</h2></span> &nbsp;&nbsp;
               <!--<span class="badge badge-warning" ><h2 id="connectionLabel">Disconnected</h2></span> &nbsp;&nbsp;-->
           </div>
           
@@ -117,16 +144,18 @@
               <div>
                 <div class="btn-group">
                   <button type="button" class="btn btn-dark btn-sm" id="autoButton">Autonomous</button>
+                  <button type="button" class="btn btn-dark btn-sm" id="resumeAutoButton">Resume Autonomous</button>
                   <button type="button" class="btn btn-primary btn-sm" id="manualButton">Manual</button>
                 </div>
                 &nbsp; &nbsp;
                 <div class="btn-group">
 	                <button class="btn btn-sm btn-danger dropdown-toggle" type="button" id="emulationButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-	                Emulation
+	                Map Emulation
 	                </button>
 	                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 	                  <a class="dropdown-item" id="emul_2x2">2x2</a>
 	                  <a class="dropdown-item" id="emul_2x2_empty">2x2 EMPTY</a>
+	                  <a class="dropdown-item" id="emul_2x2_reddot">2x2 RED DOT</a>
 	                  <a class="dropdown-item" id="emul_4x4">4x4</a>
 	                  <a class="dropdown-item" id="emul_6x4">6x4 Project Requirement</a>
 	                  <a class="dropdown-item" id="emul_6x4_empty">6x4 EMPTY</a>
@@ -195,7 +224,7 @@
       <div class="row">
         <!-- Camera Panel -->
         <div class="rounded bg-dark m-2 p-2 col">
-          <img class="rounded mx-auto d-block" src="/camera" id="cameraImage" width="320" height="240">
+          <img class="rounded mx-auto d-block" src="/camera" id="cameraImage" width="320px" height="240px">
           <canvas id="smallMapCanvas" width="320" height="240" style="display:none;"></canvas>
         </div>
             

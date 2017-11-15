@@ -154,6 +154,9 @@ $(document).ready(function(){
       
       // draw red dot
       if (isReddotStr(data[1][1])) {
+
+        console.log("red dot");
+
         var radius = blockSize / 9;
         context.beginPath();
         context.arc(startX + blockSize / 2, startY + blockSize / 2, radius, 0, Math.PI * 2, false);
@@ -229,6 +232,7 @@ $(document).ready(function(){
           [MA[y][x-1], MA[y][x], MA[y][x+1]],
           [MA[y+1][x-1], MA[y+1][x], MA[y+1][x+1]],
         ]; 
+
         if (isReddotStr(MA[y][x])) {
           signBlockArray.push([j, i, data]);
         } else if (isUnknownStr(MA[y][x]) || isUnknownStr(MA[y-1][x]) || isUnknownStr(MA[y+1][x]) || isUnknownStr(MA[y][x-1]) || isUnknownStr(MA[y][x+1])) {

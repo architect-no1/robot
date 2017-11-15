@@ -5,8 +5,10 @@ const ERROR = "ERROR";
 const DRAW = "DRAW";
 const EMUL = "EMULATION";
 
+const MODE_INIT = "init"
 const MODE_MANUAL = "manual";
-const MODE_SUSPEND = "suspend";
+const MODE_SUSPEND_CONNECTED = "suspend-connected";
+const MODE_SUSPEND_DISCONNECTED = "suspend-disconnected";
 const MODE_AUTO = "auto";
 
 const ACTION_CURRENT= "current";
@@ -30,14 +32,15 @@ const ACTION_MAP_END = "map end";
 
 // Global Configuration
 var emulationMode = false;
-var emulationDelay = 100;
+var emulationDelay = 500;
 var algorithmMode = true;
 var autoStartTime = 0;
+var currentMode = MODE_INIT;
 
 $(document).ready(function(){
   
   $("#ipInput").val("172.20.10.14");
-  $("#ipInput").val("172.20.1.43");
+  //$("#ipInput").val("128.237.128.214");
   
   var mqttClient = null;
   
@@ -52,7 +55,7 @@ $(document).ready(function(){
     
     var ip = $("#ipInput").val();
     var options = {
-      reconnectPeriod : 0,
+      reconnectPeriod : 1000,
       keepalive : 5, 
       will : {
         topic : "robot-request",
@@ -70,13 +73,23 @@ $(document).ready(function(){
 
   // Mode Button Handler
   $("#autoButton").click(function() {
-    autoStartTime = Date.now();
-    setMode(MODE_AUTO);
-    mqttPublish("algorithm-request", "maze start");  
+    setMode(MODE_AUTO, true);
+  });
+
+  $("#resumeAutoButton").click(function() {
+    setMode(MODE_AUTO, false);
   });
 
   $("#manualButton").click(function() {
     setMode(MODE_MANUAL);
+  });
+
+  $("#suspendManualButton").click(function() {
+    setMode(MODE_MANUAL);
+  });
+
+  $("#suspendResumeButton").click(function() {
+    setMode(MODE_AUTO, false);
   });
 
   $("#emul_2x2").click(function() {
@@ -90,22 +103,24 @@ $(document).ready(function(){
     startEmulation(2, 2, map);
   });
 
+  $("#emul_2x2_reddot").click(function() {
+    var map = "x x x x x x j o o x x o o o x x rwo o o x x x x x x"
+    startEmulation(2, 2, map);
+  });
+
   $("#emul_4x4").click(function() {
     startEmulation(4, 4, "x x x x x x x x x x o o o x o o o x x o x o x o x o x x o x da7 x o x o x x o x o x o x o x x rw x o x o x o x x o x o x o x o x x s x o o dd1w4 x e x x x x x x x x x x");
   });
 
   $("#emul_6x4").click(function() {
-<<<<<<< HEAD
-    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js1 o o x o o o x o x x o x x x o x x x o x o x x o o f x o o b x o o rw x x x x x x x x x x x x x x");
-=======
     startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o rw x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js3 o o x o o o x o x x o x x x o x x x o x o x x o o f x o o b x o o o x x x x x x x x x x x x x x");
->>>>>>> 55ff01bced78829ccff84ba687bacc5c89e27789
   });
 
   $("#emul_6x4_empty").click(function() {
     //startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o o o o o o o o o o o x x o o o o rwo o o o o o o x x o o o o o o o o o o o x x o o o o o o o o o o o x x o o o o o o o o o o o x x o o o o o o o o o o o x x x x x x x x x x x x x x");
     //startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js1 o o x o o o x o x x o x x x o x x x o x o x x o o e x o o s x o o rw x x x x x x x x x x x x x x");
-    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o o o x x x x x o o o x x o o o x o o o x o o o x x o o o x x x x x o o o x x o o o o rs o o o o o o x x o o o o o o o o o o o x x o o o o o o o o o o o x x x x x x x x x x x x x x");
+    //startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o o o x x x x x o o o x x o o o x o o o x o o o x x o o o x x x x x o o o x x o o o o rs o o o o o o x x o o o o o o o o o o o x x o o o o o o o o o o o x x x x x x x x x x x x x x");
+    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o jw2 x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js1 o o x o o o x o x x o x x x o x x x o x o x x o o e x o o s x o o rw x x x x x x x x x x x x x x");
   });
 
   $("#emul_stop").click(function() {
@@ -190,20 +205,96 @@ $(document).ready(function(){
   // Common functions
   // ---------------------------------------------------------------------------
 
-  setMode = function(mode) {
+  setMode = function(mode, clearmap = false) {
     switch (mode) {
+      case MODE_INIT:
+        $("#modeLabel").text("INITIAL");
+        $("#modeBadge").removeClass("badge-primary").addClass("badge-warning");
+        $("#manualButton").attr("disabled", true);
+        $("#autoButton").attr("disabled", true);
+        $("#resumeAutoButton").attr("disabled", true);
+        disableMoveButtons(true);
+        break;
+
       case MODE_AUTO:
         $("#modeLabel").text("AUTONOMOUSE");
+        $("#modeBadge").removeClass("badge-primary").addClass("badge-danger");
+        $("#manualButton").attr("disabled", false);
+        $("#autoButton").attr("disabled", true);
+        $("#resumeAutoButton").attr("disabled", true);
+        disableMoveButtons(true);
+
+        autoStartTime = Date.now();
+
+        switch(currentMode) {
+          case MODE_MANUAL:
+            if (clearmap) {
+              mqttPublish("algorithm-request", "map clear");
+            }
+            mqttPublish("algorithm-request", "maze start");
+            break;
+          case MODE_SUSPEND_CONNECTED:
+            mqttPublish("robot-request", "resume");
+            mqttPublish("algorithm-request", "maze start");
+            break;
+        } 
+
         break;
       case MODE_MANUAL:
         $("#modeLabel").text("MANUAL");
-        mqttPublish("algorithm-request", "map start");
-        drawInitMap();  
+        $("#modeBadge").removeClass("badge-warning").removeClass("badge-danger").addClass("badge-primary");
+        $("#manualButton").attr("disabled", false);
+        $("#autoButton").attr("disabled", false);
+        $("#resumeAutoButton").attr("disabled", false);
+        disableMoveButtons(false);
+
+        switch(currentMode) {
+          case MODE_INIT:
+            mqttPublish("robot-request", "resume");
+            mqttPublish("algorithm-request", "map clear");
+            mqttPublish("algorithm-request", "map start");
+            break;
+          case MODE_SUSPEND_CONNECTED:
+            mqttPublish("robot-request", "resume");
+            mqttPublish("algorithm-request", "map start");
+            break;
+          case MODE_MANUAL:
+            mqttPublish("algorithm-request", "map clear");
+            mqttPublish("algorithm-request", "map start");
+            break;
+          case MODE_AUTO:
+            mqttPublish("algorithm-request", "map start");
+            break;
+        }
         break;
-      case MODE_SUSPEND:
+      case MODE_SUSPEND_CONNECTED:
         $("#modeLabel").text("SUSPEND");
+        $("#modeBadge").removeClass("badge-danger").removeClass("badge-primary").addClass("badge-warning");
+        $("#manualButton").attr("disabled", false);
+        $("#autoButton").attr("disabled", true);
+        $("#resumeAutoButton").attr("disabled", false);
+        disableMoveButtons(false);
+
+        switch(currentMode) {
+          case MODE_SUSPEND_DISCONNECTED:
+            $('#disconnectModal').modal('hide');
+            drawLastMap("failMapCanvas");
+            $("#suspendLabel").text("Connection Established");
+            $("#suspendDescLabel").text("");
+            $("#suspendModal").modal('show');
+            break;
+        }
+        break;
+      case MODE_SUSPEND_DISCONNECTED:
+        $("#modeLabel").text("SUSPEND");
+        $("#modeBadge").removeClass("badge-danger").removeClass("badge-primary").addClass("badge-warning");
+        $("#manualButton").attr("disabled", true);
+        $("#autoButton").attr("disabled", true);
+        $("#resumeAutoButton").attr("disabled", true);
+        disableMoveButtons(false);
         break;
     }
+    currentMode = mode;
   };
 
   mqttConnect = function(ip, options) {
@@ -240,14 +331,12 @@ $(document).ready(function(){
           setMode(MODE_MANUAL);
 
         } else if (array[0] == "maze" && array[1] =="fail") {
-          drawLastMap("finishMapCanvas");
-          var elapsedTime = (Date.now() - autoStartTime) / 1000;
-          elapsedTime = elapsedTime.toFixed(1);
-          $("#finishLabel").text("Maze Mapping Fail");
-          $("#countLabel").text(array.slice(2).join(" "));
-          $("#finishModal").modal('show');
+          drawLastMap("failMapCanvas");
+          $("#suspendLabel").text("Maze Mapping Fail");
+          $("#suspendDescLabel").text(array.slice(2).join(" "));
+          $("#suspendModal").modal('show');
 
-          setMode(MODE_SUSPEND);
+          setMode(MODE_SUSPEND_CONNECTED);
         }
       }  
       
@@ -267,13 +356,17 @@ $(document).ready(function(){
       $("#ipInput").attr("disabled", true);
       appendLog(CONNECT, "Connection is established");
       $("#connectionLabel").text("Connected");
+
       mqttClient.subscribe("algorithm-request");
       mqttClient.subscribe("algorithm-response");
       mqttClient.subscribe("robot-request");
       mqttClient.subscribe("robot-response");
 
-      setMode(MODE_MANUAL);
-      mqttPublish("algorithm-request", "map start");
+      if (currentMode == MODE_INIT) {
+        setMode(MODE_MANUAL);
+      } else if (currentMode == MODE_SUSPEND_DISCONNECTED) {
+        setMode(MODE_SUSPEND_CONNECTED);
+      }
     });
 
     mqttClient.on('close', function () {
@@ -281,8 +374,8 @@ $(document).ready(function(){
       $("#ipInput").attr("disabled", false);
       appendLog(ERROR, "Connection closed");
       $("#connectionLabel").text("Disconnected");
-      setMode(MODE_SUSPEND);
 
+      setMode(MODE_SUSPEND_DISCONNECTED);
       $('#disconnectModal').modal('show');
       $('#disconnectModal').focus();
     });
@@ -323,10 +416,20 @@ $(document).ready(function(){
     $("#forwardButton").attr("disabled", disabled);
     $("#rightButton").attr("disabled", disabled);
     $("#leftButton").attr("disabled", disabled);
-    $("#uturnButton").attr("disabled", disabled);
+    $("#backwardButton").attr("disabled", disabled);
+    $("#signButton").attr("disabled", disabled);
+
+    $("#pauseButton").attr("disabled", disabled);
+    $("#resumeButton").attr("disabled", disabled);
     $("#stopButton").attr("disabled", disabled);
+
+    $("#servoupButton").attr("disabled", disabled);
+    $("#servodownButton").attr("disabled", disabled);
+    $("#servoleftButton").attr("disabled", disabled);
+    $("#servorightButton").attr("disabled", disabled);
+    $("#captureButton").attr("disabled", disabled);
   };
   
-
   $("#algorithm_robot").trigger("click");
+  setMode(MODE_INIT);
 });
