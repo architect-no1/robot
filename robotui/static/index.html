@@ -15,7 +15,7 @@
     <!-- Custom styles for this template -->
     <link href="./css/dashboard.css" rel="stylesheet">
     
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!--<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">-->
     
   </head>
 
@@ -61,7 +61,7 @@
 		      </div>
 		      <div class="mx-auto">
 		        <p class="text-center">
-            <h2>Maze Mapping Finish</h2>
+            <h2 id="finishLabel">Maze Mapping Finish</h2>
             <h3 id="countLabel">0/0</h3>
             <canvas id="finishMapCanvas" width="400" height="400"></canvas>
 		        </p>
@@ -95,8 +95,8 @@
           
           <!-- Notification Panel -->
           <div class="alert alert-info" role="alert">
-              <span class="badge badge-primary">Connecting</span> &nbsp;&nbsp;
-            <strong>Please connect to ROBOT.</strong>
+              <span class="badge badge-primary"><h2 id="modeLabel">Suspend</h2></span> &nbsp;&nbsp;
+              <!--<span class="badge badge-warning" ><h2 id="connectionLabel">Disconnected</h2></span> &nbsp;&nbsp;-->
           </div>
           
           <!-- Control Panel -->
@@ -200,6 +200,7 @@
         </div>
             
         <!-- Status Panel -->
+<!--
         <div class="rounded bg-dark m-2 p-1 col">
           <div class="text-md-right mb-1">
             <button class="badge btn btn-info btn-sm" type="button">Refresh</button>
@@ -214,9 +215,9 @@ Some Sensor : <font class="text-warning">...</font>
 Some Sensor : <font class="text-warning">...</font>
 </pre>
         </div>
-        
+-->        
         <!-- Log Panel -->
-        <div class="rounded bg-dark m-2 p-1 col-6">
+        <div class="rounded bg-dark m-2 p-1 col-8">
           <div class="text-md-right mb-1">
             <button class="badge btn btn-info btn-sm" type="button">Save</button>
             <button class="badge btn btn-info btn-sm" type="button" id="logClearButton">Clear</button>

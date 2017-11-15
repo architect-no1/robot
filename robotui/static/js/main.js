@@ -5,6 +5,10 @@ const ERROR = "ERROR";
 const DRAW = "DRAW";
 const EMUL = "EMULATION";
 
+const MODE_MANUAL = "manual";
+const MODE_SUSPEND = "suspend";
+const MODE_AUTO = "auto";
+
 const ACTION_CURRENT= "current";
 const ACTION_FORWARD = "forward";
 const ACTION_LEFT = "left";
@@ -32,7 +36,8 @@ var autoStartTime = 0;
 
 $(document).ready(function(){
   
-  $("#ipInput").val("128.237.181.46");
+  $("#ipInput").val("172.20.10.14");
+  $("#ipInput").val("172.20.1.43");
   
   var mqttClient = null;
   
@@ -48,7 +53,11 @@ $(document).ready(function(){
     var ip = $("#ipInput").val();
     var options = {
       reconnectPeriod : 0,
-      keepalive : 10
+      keepalive : 5, 
+      will : {
+        topic : "robot-request",
+        payload : "pause" 
+      }
     };
     
     if (ip == "") {
@@ -62,12 +71,12 @@ $(document).ready(function(){
   // Mode Button Handler
   $("#autoButton").click(function() {
     autoStartTime = Date.now();
+    setMode(MODE_AUTO);
     mqttPublish("algorithm-request", "maze start");  
   });
 
   $("#manualButton").click(function() {
-    mqttPublish("algorithm-request", "map start");
-    drawInitMap();  
+    setMode(MODE_MANUAL);
   });
 
   $("#emul_2x2").click(function() {
@@ -86,7 +95,11 @@ $(document).ready(function(){
   });
 
   $("#emul_6x4").click(function() {
+<<<<<<< HEAD
+    startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o o x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js1 o o x o o o x o x x o x x x o x x x o x o x x o o f x o o b x o o rw x x x x x x x x x x x x x x");
+=======
     startEmulation(6, 4, "x x x x x x x x x x x x x x o o o o o o o o o o rw x x o x x x o x x x o o o x x o x o x o o o x o o o x x o x o x o x o x x x o x x o o js3 o o x o o o x o x x o x x x o x x x o x o x x o o f x o o b x o o o x x x x x x x x x x x x x x");
+>>>>>>> 55ff01bced78829ccff84ba687bacc5c89e27789
   });
 
   $("#emul_6x4_empty").click(function() {
@@ -177,6 +190,22 @@ $(document).ready(function(){
   // Common functions
   // ---------------------------------------------------------------------------
 
+  setMode = function(mode) {
+    switch (mode) {
+      case MODE_AUTO:
+        $("#modeLabel").text("AUTONOMOUSE");
+        break;
+      case MODE_MANUAL:
+        $("#modeLabel").text("MANUAL");
+        mqttPublish("algorithm-request", "map start");
+        drawInitMap();  
+        break;
+      case MODE_SUSPEND:
+        $("#modeLabel").text("SUSPEND");
+        break;
+    }
+  };
+
   mqttConnect = function(ip, options) {
     appendLog(CONNECT, "Connect to " + ip);
     
@@ -204,9 +233,21 @@ $(document).ready(function(){
           drawLastMap("finishMapCanvas");
           var elapsedTime = (Date.now() - autoStartTime) / 1000;
           elapsedTime = elapsedTime.toFixed(1);
-
+          $("#finishLabel").text("Maze Mapping Finish");
           $("#countLabel").text(elapsedTime + " secs / " + array[2] + " moves");
           $("#finishModal").modal('show');
+
+          setMode(MODE_MANUAL);
+
+        } else if (array[0] == "maze" && array[1] =="fail") {
+          drawLastMap("finishMapCanvas");
+          var elapsedTime = (Date.now() - autoStartTime) / 1000;
+          elapsedTime = elapsedTime.toFixed(1);
+          $("#finishLabel").text("Maze Mapping Fail");
+          $("#countLabel").text(array.slice(2).join(" "));
+          $("#finishModal").modal('show');
+
+          setMode(MODE_SUSPEND);
         }
       }  
       
@@ -225,20 +266,23 @@ $(document).ready(function(){
       $("#connectButton").attr("disabled", true);
       $("#ipInput").attr("disabled", true);
       appendLog(CONNECT, "Connection is established");
-
+      $("#connectionLabel").text("Connected");
       mqttClient.subscribe("algorithm-request");
       mqttClient.subscribe("algorithm-response");
       mqttClient.subscribe("robot-request");
       mqttClient.subscribe("robot-response");
 
+      setMode(MODE_MANUAL);
       mqttPublish("algorithm-request", "map start");
     });
 
     mqttClient.on('close', function () {
       $("#connectButton").attr("disabled", false);
       $("#ipInput").attr("disabled", false);
-      console.log(mqttClient);
       appendLog(ERROR, "Connection closed");
+      $("#connectionLabel").text("Disconnected");
+      setMode(MODE_SUSPEND);
+
       $('#disconnectModal').modal('show');
       $('#disconnectModal').focus();
     });
@@ -284,5 +328,5 @@ $(document).ready(function(){
   };
   
 
-  $("#algorithm_ui").trigger("click");
+  $("#algorithm_robot").trigger("click");
 });
