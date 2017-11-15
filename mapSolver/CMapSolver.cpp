@@ -3,6 +3,7 @@
 #include "CFloodFill.h"
 #include <iostream>
 #include "Astar.h"
+#include "random_search.h"
 
 CMapSolver::CMapSolver(int algo_mode)
 {
@@ -13,8 +14,10 @@ CMapSolver::CMapSolver(int algo_mode)
     }
     else
     {
-        pAlgo = new CFloodFill();
-        fprintf(stderr, "flood-fill algorithm\n");
+//        pAlgo = new CFloodFill();
+//        fprintf(stderr, "flood-fill algorithm\n");
+        pAlgo = new CRanSearch();
+        fprintf(stderr, "random search algorithm\n");
     }
 
 }

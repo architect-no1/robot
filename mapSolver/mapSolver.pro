@@ -16,7 +16,8 @@ SOURCES += main.cpp \
     CMapSolver.cpp \
     CSimulRobot.cpp \
     MapMaker.cpp \
-    mapsolver_main.cpp
+    mapsolver_main.cpp \
+    random_search.cpp
 
 HEADERS += \
     Astar.h \
@@ -26,4 +27,5 @@ HEADERS += \
     CSimulRobot.h \
     MapMaker.h \
     mapsolver_main.h \
-    mapType.h
+    mapType.h \
+    random_search.h
