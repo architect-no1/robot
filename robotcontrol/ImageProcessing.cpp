@@ -108,8 +108,8 @@ float FindLineInImageAndComputeOffset2(cv::Mat& CameraImage, bool &foundCrossing
   line( CameraImage,Point(CameraImage.cols/2,0),Point(CameraImage.cols/2,CameraImage.rows),Scalar( 0, 0, 0 ),2,8);
   //if (!IsPi3) imshow( "processed", dilateImg );
   offsetfromcenter=1.0f - 2.0f*(float)minMaxCx/roi.cols;
-  sprintf(text,"Nav Value %f",offsetfromcenter);
-  cv::putText(CameraImage, text,cv::Point(10,50),  CV_FONT_HERSHEY_PLAIN, 2,CV_RGB(0,0,0),3);
+  //sprintf(text,"Nav Value %f",offsetfromcenter);
+  //cv::putText(CameraImage, text,cv::Point(10,50),  CV_FONT_HERSHEY_PLAIN, 2,CV_RGB(0,0,0),3);
 
   /* find red thing in roi
   Mat hsv;
