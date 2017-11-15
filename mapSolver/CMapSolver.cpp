@@ -4,10 +4,19 @@
 #include <iostream>
 #include "Astar.h"
 
-CMapSolver::CMapSolver()
+CMapSolver::CMapSolver(int algo_mode)
 {
-    //pAlgo = new CFloodFill();
-    pAlgo = new CAstar();
+    if(algo_mode == 0)
+    {
+        pAlgo = new CAstar();
+        fprintf(stderr, "a-star algorithm\n");
+    }
+    else
+    {
+        pAlgo = new CFloodFill();
+        fprintf(stderr, "flood-fill algorithm\n");
+    }
+
 }
 
 CMapSolver::~CMapSolver()
@@ -180,7 +189,13 @@ eMovCmd CMapSolver::MapBuilder_1step(eMapNode * map, int width, int height, int 
 		}
 		else
 		{
-            fprintf(stderr, "!!! There is NO path\n");
+            if(CheckRedDot(map, width, height, cur_x, cur_y) == true)
+            {
+                fprintf(stderr, "!!! There is NO path(1) - but red\n");
+                pathQueue.push(eMovCmd_SEARCH_SIGN);
+            }
+            else
+                fprintf(stderr, "!!! There is NO path(1)\n");
 		}
 	}
 
@@ -201,6 +216,9 @@ eMovCmd CMapSolver::MapBuilder_1step(eMapNode * map, int width, int height, int 
 
 			if (path.size() > 0)
 			{
+                if(CheckRedDot(map, width, height, cur_x, cur_y) == true)
+                    pathQueue.push(eMovCmd_SEARCH_SIGN);
+
 				for (size_t i = 0; i < path.size(); i++)
 					pathQueue.push(path[i]);
 
@@ -209,7 +227,13 @@ eMovCmd CMapSolver::MapBuilder_1step(eMapNode * map, int width, int height, int 
 			}
 			else
 			{
-                fprintf(stderr, "!!! There is NO path\n");
+                if(CheckRedDot(map, width, height, cur_x, cur_y) == true)
+                {
+                    fprintf(stderr, "!!! There is NO path(2) - but red\n");
+                    pathQueue.push(eMovCmd_SEARCH_SIGN);
+                }
+                else
+                    fprintf(stderr, "!!! There is NO path(2)\n");
 			}
 		}
 	}

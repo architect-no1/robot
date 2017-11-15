@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include "mapsolver_main.h"
 
-MapSolver_main::MapSolver_main()
+MapSolver_main::MapSolver_main(int algo_mode)
 {
+    pMapSol = new CMapSolver(algo_mode);
+}
 
+MapSolver_main::~MapSolver_main()
+{
+    delete pMapSol;
 }
 
 void MapSolver_main::init()
@@ -12,7 +17,7 @@ void MapSolver_main::init()
     befMovCmd = eMovCmd_STOP;
 
     mapMak.init();
-    mapSol.init();
+    pMapSol->init();
 
     step = 0;
 }
@@ -159,7 +164,7 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                 if(state == STATE_MAZE_SOLVE) // only works maze solving mode
                 {
                     // make path to go to unknown, and store in queue, and pop 1 item
-                    eMovCmd movCmd = mapSol.MapBuilder_1step(mapMak.map
+                    eMovCmd movCmd = pMapSol->MapBuilder_1step(mapMak.map
                                             , mapMak.map_size, mapMak.map_size
                                             , mapMak.cur_x, mapMak.cur_y, mapMak.cur_heading);
 
@@ -178,8 +183,9 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
                     {
                         // SEND MOV COMMAND TO ROBOT
                         out_msg.push_back("robot-control");
-                        out_msg.push_back(mapSol.translate_eMovCMd2String(movCmd));
-                        fprintf(stderr, ">> robot command : %s\n\n", mapSol.translate_eMovCMd2String(movCmd).c_str());
+                        out_msg.push_back(pMapSol->translate_eMovCMd2String(movCmd));
+                        fprintf(stderr, ">> robot command : %s\n\n"
+                                , pMapSol->translate_eMovCMd2String(movCmd).c_str());
                     }
                 }
 

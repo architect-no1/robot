@@ -36,7 +36,8 @@ enum STATE
 class MapSolver_main
 {
 public:
-    MapSolver_main();
+    MapSolver_main(int algo_mode);
+    ~MapSolver_main();
 
     void init();
     std::vector<std::string> process(std::string msg);
@@ -53,7 +54,7 @@ private:
     eMovCmd befMovCmd;
     CSimulRobot simul_robo;
 
-    CMapSolver mapSol;
+    CMapSolver * pMapSol;
     MapMaker mapMak;
 
     int step;

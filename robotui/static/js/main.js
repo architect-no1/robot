@@ -71,8 +71,9 @@ $(document).ready(function(){
   });
 
   $("#emul_2x2").click(function() {
-    var map = "x x x x x x o o o x x o x o x x o x e x x x x x x"
-    startEmulation(2, 2, map);
+    //var map = "x x x x x x o o o x x o x o x x o x e x x x x x x"
+	var map = "x x x x x x x x o o o x o x x o x o x o x x o x o x o x x o x o x o x x js2 x rs x o x x x x x x x x"
+    startEmulation(3, 3, map);
   });
 
   $("#emul_2x2_empty").click(function() {
