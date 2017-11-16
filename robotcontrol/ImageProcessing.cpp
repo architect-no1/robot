@@ -55,6 +55,10 @@ float FindLineInImageAndComputeOffset2(cv::Mat& CameraImage, bool &foundCrossing
    cv::Mat mask = mask1 | mask2;
    thresh |= mask;
 
+   cv::Mat green;
+   inRange(roi, cv::Scalar(0, 160, 100), cv::Scalar(255, 255, 255), green);
+   thresh &= ~green;
+
    Mat erodeElmt = getStructuringElement(MORPH_RECT, Size(3,3));
    Mat dilateElmt = getStructuringElement(MORPH_RECT, Size(5,5));
    erode(thresh, erodeImg, erodeElmt);       // reduces noise Extract edges 
