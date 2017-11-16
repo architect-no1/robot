@@ -10,7 +10,7 @@
 
 #define SERVO_CENTER_OR_STOP 150
 
-#define TRK_LINE_CAM_PAN     149 //157
+#define TRK_LINE_CAM_PAN     140 //157
 #define TRK_LINE_CAM_TILT    211 //192
 
 
