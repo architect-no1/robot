@@ -39,31 +39,31 @@ std::string CMapSolver::translate_eMovCMd2String(eMovCmd mov)
 	switch (mov)
 	{
     case eMovCmd_FORWARD:
-		str = "forward";
+        str = "forward\n";
 		break;
 
     case eMovCmd_LEFT:
-		str = "left";
+        str = "left\n";
 		break;
 
     case eMovCmd_RIGHT:
-		str = "right";
+        str = "right\n";
 		break;
 
     case eMovCmd_SEARCH_SIGN:
-        str = "sign";
+        str = "sign\n";
 		break;
 
     case eMovCmd_STOP:
-		str = "stop";
+        str = "stop\n";
 		break;
 
     case eMovCmd_UTURN:
-        str = "backward";
+        str = "backward\n";
 		break;
 
 	default:
-		str = "stop";
+        str = "stop\n";
 		break;
 	}
 

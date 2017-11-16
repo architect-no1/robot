@@ -1,5 +1,6 @@
 #include "MapMaker.h"
 #include <stdio.h>
+#include <vector>
 
 #define MAP_SIZE 100
 
@@ -352,9 +353,8 @@ std::string MapMaker::send_map()
 {
     std::string outmsg;
 
-    int sign_x = -1;
-    int sign_y = -1;
-    std::string sign_str;
+    std::vector<cPoint> signPos;
+    std::vector<std::string> signStr;
 
     int map_width = map_right - map_left + 1;
     int map_height = map_top - map_bottom + 1;
@@ -381,15 +381,15 @@ std::string MapMaker::send_map()
             int tmpStr_pos = tmpStr_pos_y * map_width + tmpStr_pos_x;
             eMapNode grid_info = map[k*MAP_SIZE+i];
 
+            std::string sign_str;
             // draw grid info
-            if(sign_str.size() == 0 && CheckSignNode(grid_info, &sign_str) == true)
+            if(CheckSignNode(grid_info, &sign_str) == true)
             {
-                sign_x = i - map_left;
-                sign_y = k - map_bottom;
-
                 tmpStr[tmpStr_pos] = 'j';
+                signPos.push_back(cPoint(i - map_left, k - map_bottom));
+                signStr.push_back(sign_str);
 
-                fprintf(stderr, "sign str : %s\n" , sign_str.c_str());
+                fprintf(stderr, "(%d, %d) sign str : %s\n" , i, k, sign_str.c_str());
             }
             else if(grid_info == eMapNode_UNKNOWN) // unknown
                 tmpStr[tmpStr_pos] = '-';
@@ -426,27 +426,38 @@ std::string MapMaker::send_map()
     {
         for(int k = 0; k < map_width; k++)
         {
+            int checkSignPos = -1;
+
+            for(int n = 0; n < signPos.size(); n++)
+            {
+                if(k == signPos[n].x && i == signPos[n].y)
+                    checkSignPos = n;
+            }
+
             if(k == robo_x && i == robo_y)
             {
-                if(k == sign_x && i == sign_y)
+                if(checkSignPos != -1)
                 {
-                    fprintf(stderr, "!!!! robot + sign : %s\n", sign_str.c_str());
-                    outmsg += robo_str + sign_str;
+                    fprintf(stderr, "!!!! robot + sign : %s\n"
+                            , signStr[checkSignPos].c_str());
+                    outmsg += robo_str + signStr[checkSignPos];
                 }
                 else
                 {
-                    fprintf(stderr, "!!!! robot + normal : %s, (%d, %d), (%d, %d)\n", sign_str.c_str(), robo_x, robo_y, sign_x, sign_y);
+                    //fprintf(stderr, "!!!! robot + normal : %s, (%d, %d), (%d, %d)\n", sign_str.c_str(), robo_x, robo_y, sign_x, sign_y);
                     outmsg += robo_str + format("%c ", tmpStr[i*map_width + k]);
                 }
             }
-            else if(k == sign_x && i == sign_y)
+            else if(checkSignPos != -1)
             {
-                outmsg += sign_str;
+                outmsg += signStr[checkSignPos];
             }
             else
                 outmsg += format("%c ", tmpStr[i*map_width + k]);
         }
     }
+
+    outmsg += "\n";
 
     fprintf(stderr, ">> send map : %s\n", outmsg.c_str());
 

@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     int algo_mode = 0;
 
-    fprintf(stderr, "ver 1.4 random + trap escape\n");
+    fprintf(stderr, "ver 1.5 multi red-dot, remove enter\n");
 
     if(argc > 1)
     {
@@ -32,9 +32,9 @@ int main(int argc, char *argv[])
             for(int i = 0; i < outmsg.size(); i+=2)
             {
                 if(outmsg[i].find("robot-control") != std::string::npos)
-                    printf("%s\n", outmsg[i+1].c_str());
+                    printf("%s", outmsg[i+1].c_str());
                 else if(outmsg[i].find("algorithm-response") != std::string::npos)
-                    printf("%s\n", outmsg[i+1].c_str());
+                    printf("%s", outmsg[i+1].c_str());
 
                 fflush(stdout);
             }

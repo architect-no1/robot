@@ -392,7 +392,10 @@ std::vector<cPoint> CAstar::solve(eMapNode * map, int width, int height
                             uturn_y = start_y;
                         }
 
-                        headTable[uturn_y*width + uturn_x] = -90;
+                        int new_heading = start_heading + 180;
+                        while(new_heading > 180) new_heading -= 360;
+
+                        headTable[uturn_y*width + uturn_x] = new_heading;
                         float new_cost = parent_sCost + 3.62f;
                         s_cost[uturn_y*width + uturn_x] = new_cost;
                         ptList.push_back(stAstarEle(cPoint(uturn_x, uturn_y), new_cost));
