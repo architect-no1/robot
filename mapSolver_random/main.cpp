@@ -9,12 +9,12 @@ int main(int argc, char *argv[])
 
     fprintf(stderr, "ver 1.6 uturn clear, maze end \n");
 
-    if(argc > 1)
-    {
-        std::string arg_str(argv[1]);
-        if(arg_str.find("-random") != std::string::npos)
+//    if(argc > 1)
+//    {
+//        std::string arg_str(argv[1]);
+//        if(arg_str.find("-random") != std::string::npos)
             algo_mode = 1;
-    }
+//    }
 
     std::string line;
     MapSolver_main mapSol_main(algo_mode);
