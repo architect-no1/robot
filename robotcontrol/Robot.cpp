@@ -304,7 +304,7 @@ public:
           r->setWheelSpeed(0, BASESPEED);
         else
           r->setWheelSpeed(BASESPEED, 0);
-        if (TICKS_TURN <= ticks) {
+        if (TICKS_TURN_TURN <= ticks) {
           ticks = 0;
           state = BEFORE_CROSSING;
         }
@@ -390,21 +390,21 @@ public:
     switch (state) {
       case BACKWARD1:
         r->setWheelSpeed(0, -BASESPEED);
-        if (TICKS_TURN <= ticks) {
+        if (TICKS_BACKWARD_TURN <= ticks) {
           ticks = 0;
           state = BACKWARD2;
         }
         break;
       case BACKWARD2:
         r->setWheelSpeed(BASESPEED, 0);
-        if (TICKS_TURN <= ticks) {
+        if (TICKS_BACKWARD_TURN <= ticks) {
           ticks = 0;
           state = BACKWARD3;
         }
         break;
       case BACKWARD3:
         r->followLineForward();
-        if (5 <= ticks) {
+        if (TICKS_BACKWARD_FORWARD <= ticks) {
           r->backwardComplete();
         }
         break;
@@ -438,6 +438,9 @@ public:
   CheckSignBehavior(Robot* r) : Behavior(r),
       ticks(0), state(MOVE_BACK) {
     r->followLineForwardInit();
+    isWallFront = r->isWallFront();
+    isWallLeft = r->isWallLeft();
+    isWallRight = r->isWallRight();
   }
   ~CheckSignBehavior() {
   }
@@ -454,6 +457,12 @@ public:
         }
         break;
       case LOOK_FORWARD:
+        if (!isWallFront) {
+          state = LOOK_LEFT;
+          ticks = 0;
+          break;
+        }
+
         r->c.setPan(CAMERA_CHECKSIGN_FORWARD_PAN);
         r->c.setTilt(CAMERA_CHECKSIGN_FORWARD_TILT);
         if (TICKS_CHECKSIGN_TURNSERVOS <= ticks) {
@@ -463,12 +472,21 @@ public:
         break;
       case CHECK_SIGN_FORWARD:
         signForward = getSign(r->getCamera());
-        if (0 < signForward.length() || TICKS_CHECKSIGN_CHECKSIGN <= ticks) {
+        if (0 < signForward.length()) {
+          state = LOOK_RESET;
+          ticks = 0;
+        } else if (TICKS_CHECKSIGN_CHECKSIGN <= ticks) {
           state = LOOK_LEFT;
           ticks = 0;
         }
         break;
       case LOOK_LEFT:
+        if (!isWallLeft) {
+          state = LOOK_RIGHT;
+          ticks = 0;
+          break;
+        }
+
         r->c.setPan(CAMERA_CHECKSIGN_LEFT_PAN);
         r->c.setTilt(CAMERA_CHECKSIGN_LEFT_TILT);
         if (TICKS_CHECKSIGN_TURNSERVOS <= ticks) {
@@ -478,12 +496,21 @@ public:
         break;
       case CHECK_SIGN_LEFT:
         signLeft = getSign(r->getCamera());
-        if (0 < signLeft.length() || TICKS_CHECKSIGN_CHECKSIGN <= ticks) {
+        if (0 < signLeft.length()) {
+          state = LOOK_RESET;
+          ticks = 0;
+        } else if (TICKS_CHECKSIGN_CHECKSIGN <= ticks) {
           state = LOOK_RIGHT;
           ticks = 0;
         }
         break;
       case LOOK_RIGHT:
+        if (!isWallRight) {
+          state = LOOK_RESET;
+          ticks = 0;
+          break;
+        }
+
         r->c.setPan(CAMERA_CHECKSIGN_RIGHT_PAN);
         r->c.setTilt(CAMERA_CHECKSIGN_RIGHT_TILT);
         if (TICKS_CHECKSIGN_TURNSERVOS <= ticks) {
@@ -531,6 +558,9 @@ private:
     MOVE_FRONT,
   } state;
 
+  bool isWallFront;
+  bool isWallLeft;
+  bool isWallRight;
   std::string signForward;
   std::string signLeft;
   std::string signRight;

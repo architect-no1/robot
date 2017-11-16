@@ -92,6 +92,8 @@ public:
     filename += id;
     filename += ".jpg";
     imwrite(filename.c_str(), mat);
+    id++;
+    if (1000 <= id) id = 0;
   }
 
   virtual void onCheckSignComplete(std::string forward,
