@@ -304,7 +304,7 @@ public:
           r->setWheelSpeed(0, BASESPEED);
         else
           r->setWheelSpeed(BASESPEED, 0);
-        if (TICKS_TURN <= ticks) {
+        if (TICKS_TURN_TURN <= ticks) {
           ticks = 0;
           state = BEFORE_CROSSING;
         }
@@ -390,21 +390,21 @@ public:
     switch (state) {
       case BACKWARD1:
         r->setWheelSpeed(0, -BASESPEED);
-        if (TICKS_TURN <= ticks) {
+        if (TICKS_BACKWARD_TURN <= ticks) {
           ticks = 0;
           state = BACKWARD2;
         }
         break;
       case BACKWARD2:
         r->setWheelSpeed(BASESPEED, 0);
-        if (TICKS_TURN <= ticks) {
+        if (TICKS_BACKWARD_TURN <= ticks) {
           ticks = 0;
           state = BACKWARD3;
         }
         break;
       case BACKWARD3:
         r->followLineForward();
-        if (5 <= ticks) {
+        if (TICKS_BACKWARD_FORWARD <= ticks) {
           r->backwardComplete();
         }
         break;
