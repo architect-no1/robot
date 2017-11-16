@@ -118,9 +118,13 @@ void MapMaker::update_core(CEnvInfo envInfo, int front_index, int left_index, in
     else
         map[right_index] = eMapNode_CLEAR;
 
-
-    if(map[back_index] == eMapNode_UNKNOWN)
-        map[back_index] = eMapNode_BACK;
+    if(envInfo.back == 1)
+        map[back_index] = eMapNode_CLEAR;
+    else
+    {
+        if(map[back_index] == eMapNode_UNKNOWN)
+            map[back_index] = eMapNode_BACK;
+    }
 }
 
 void MapMaker::Dir2SignIndex(int heading

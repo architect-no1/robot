@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     int algo_mode = 0;
 
-    fprintf(stderr, "ver 1.5 multi red-dot, remove enter\n");
+    fprintf(stderr, "ver 1.6 uturn clear, maze end \n");
 
 //    if(argc > 1)
 //    {

@@ -9,19 +9,22 @@
 class CEnvInfo
 {
 public:
-        int front; // 1 wall
+    int front; // 1 wall
 	int left;
 	int right;
-        int center; // 1 start, 2 end, 3 red dot
+    int center; // 1 start, 2 end, 3 red dot
+
+    int back; // only use for u-turn
+
 	std::string frontSign;
 	std::string leftSign;
 	std::string rightSign;
 
-        CEnvInfo() : front(0), left(0), right(0), center(0) { }
+        CEnvInfo() : front(0), left(0), right(0), center(0), back(0) { }
 
 	void clear()
 	{
-                front = left = right = center = 0;
+        front = left = right = center = back = 0;
 		frontSign = leftSign = rightSign = "";
 	}
 };

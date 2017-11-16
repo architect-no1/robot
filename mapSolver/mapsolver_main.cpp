@@ -153,7 +153,7 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
 
                 // SEND CURRENT MAP
     #ifndef SIMUL_MODE
-                out_msg.push_back("algorithm-response");
+                out_msg.push_back("algorithm-response\n");
                 out_msg.push_back(mapMak.send_map());
     #endif
 
@@ -170,12 +170,12 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
 
                     if(movCmd == eMovCmd_STOP)
                     {
-                        out_msg.push_back("algorithm-response");
+                        out_msg.push_back("algorithm-response\n");
 
                         std::string errMsg;
                         bool conditionEnd = checkEndCondition(mapMak.map, mapMak.map_size, mapMak.map_size, &errMsg);
                         if(conditionEnd == true)
-                            out_msg.push_back(format("maze end %d", step));
+                            out_msg.push_back(format("maze end %d\n", step));
                         else
                             out_msg.push_back("maze fail " + errMsg);
                     }
@@ -343,7 +343,12 @@ CMD_TYPE MapSolver_main::parsing(std::string line, eMovCmd *robotMov, CEnvInfo *
                 if(env_str.size() < 5)
                     fprintf(stderr, "too short robot map");
                 else
+                {
                     Str2Env(env_str, env);
+
+                    if(*robotMov == eMovCmd_UTURN)
+                        env->back = 1;
+                }
             }
         }
     }
