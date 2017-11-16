@@ -104,7 +104,6 @@ std::vector<std::string> MapSolver_main::process(std::string msg)
     else if(cmd == CMD_ACK_SIGN_CANNOT)
     {
         step = 0;
-        mapMak.init();
         state = STATE_READY;
 
         out_msg.push_back("algorithm-response\n");

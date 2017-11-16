@@ -33,6 +33,8 @@ void MapMaker::init()
            map[i*MAP_SIZE + k] = eMapNode_UNKNOWN;
        }
    }
+
+   fprintf(stderr, "----- map cleared\n");
 }
 
 void MapMaker::update_MapSize()
